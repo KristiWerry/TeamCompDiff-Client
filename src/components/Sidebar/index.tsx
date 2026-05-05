@@ -2,36 +2,32 @@
 
 import { useAppDispatch, useAppSelector } from "../../app/redux";
 import { setIsSidebarCollapsed } from "../../state";
-import { useGetAuthUserQuery, useGetProjectsQuery } from "../../state/api";
+import { useGetAuthUserQuery } from "../../state/api";
 import { signOut } from "aws-amplify/auth";
 import {
-  Briefcase,
+  BarChart3,
   ChevronDown,
   ChevronUp,
   Home,
   LucideIcon,
   Search,
-  Settings,
+  Settings2,
   User,
   Users,
   X,
-  Settings2
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const Sidebar = () => {
-  const [showProjects, setShowProjects] = useState(true);
-  const [showPriority, setShowPriority] = useState(true);
+  const [showTeamComps, setShowTeamComps] = useState(false);
 
-  const { data: projects } = useGetProjectsQuery();
   const dispatch = useAppDispatch();
-  const isSidebarCollapsed = useAppSelector(
-    (state: any) => state.global.isSidebarCollapsed,
-  );
+  const isSidebarCollapsed = useAppSelector((state: any) => state.global?.isSidebarCollapsed ?? false);
+  const { data: currentUser, isLoading } = useGetAuthUserQuery({});
+  const currentUserDetails = currentUser?.userDetails;
 
-  const { data: currentUser } = useGetAuthUserQuery({});
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -39,83 +35,71 @@ const Sidebar = () => {
       console.error("Error signing out: ", error);
     }
   };
-  if (!currentUser) return null;
-  const currentUserDetails = currentUser?.userDetails;
 
-  const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
-    transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
-    ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
+  const sidebarClassNames = `fixed flex flex-col h-full justify-between shadow-xl
+    transition-all duration-300 z-40 overflow-y-auto
+    bg-card border-r border-border
+    ${isSidebarCollapsed ? "w-0 overflow-hidden" : "w-64"}
   `;
 
   return (
     <div className={sidebarClassNames}>
       <div className="flex h-full w-full flex-col justify-start">
-        {/* TOP LOGO */}
-        <div className="z-50 flex min-h-14 w-64 items-center justify-between bg-white px-6 pt-3 dark:bg-black">
-          <div className="text-xl font-bold text-gray-800 dark:text-white">
+        {/* Logo */}
+        <div className="flex min-h-14 w-64 items-center justify-between px-6 pt-3 pb-2">
+          <div className="text-lg font-bold text-foreground tracking-tight">
             Team Comp Diff
           </div>
-          {isSidebarCollapsed ? null : (
-            <button
-              className="py-3"
-              onClick={() => {
-                dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
-              }}
-            >
-              <X className="h-6 w-6 text-gray-800 hover:text-gray-500 dark:text-white" />
-            </button>
+          <button
+            className="p-1 rounded hover:bg-accent"
+            onClick={() => dispatch(setIsSidebarCollapsed(true))}
+          >
+            <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+          </button>
+        </div>
+
+        {/* User section */}
+        <div className="flex items-center gap-3 border-y border-border px-6 py-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+            <User className="h-4 w-4 text-primary" />
+          </div>
+          {isLoading ? (
+            <div className="h-4 w-28 rounded bg-muted animate-pulse" />
+          ) : (
+            <span className="text-sm font-medium text-foreground truncate">
+              {currentUserDetails?.username ?? currentUser?.user?.username ?? "—"}
+            </span>
           )}
         </div>
-        {/* TEAM */}
-        <div className="flex items-center gap-5 border-y-[1.5px] border-gray-200 px-8 py-4 dark:border-gray-700">
-          <div>
-            <h3 className="text-md font-bold tracking-wide dark:text-gray-200">
-              {currentUserDetails?.username}
-            </h3>
-          </div>
-        </div>
-        {/* NAVBAR LINKS */}
-        <nav className="z-10 w-full">
-          <SidebarLink icon={Home} label="Team Comp Analyzer" href="/" />
+
+        {/* Nav links */}
+        <nav className="z-10 w-full mt-2">
+          <SidebarLink icon={Home} label="Team Analysis" href="/" />
           <SidebarLink icon={Search} label="Opponent Scouting" href="/scouting" />
+          <SidebarLink icon={BarChart3} label="Team Comps" href="/comps" />
+          <SidebarLink icon={Users} label="Draft" href="/draft" />
           <SidebarLink icon={Settings2} label="Account" href="/account" />
-          <SidebarLink icon={User} label="Teammates" href="/teammates" />
-          <SidebarLink icon={Users} label="Teams" href="/teams" />
         </nav>
 
-        {/* Team Comps LINKS */}
+        {/* Team Comps section (future) */}
         <button
-          onClick={() => setShowProjects((prev) => !prev)}
-          className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
+          onClick={() => setShowTeamComps((prev) => !prev)}
+          className="flex w-full items-center justify-between px-6 py-3 text-sm text-muted-foreground hover:text-foreground"
         >
-          <span className="">Team Comps</span>
-          {showProjects ? (
-            <ChevronUp className="h-5 w-5" />
-          ) : (
-            <ChevronDown className="h-5 w-5" />
-          )}
+          <span>Saved Comps</span>
+          {showTeamComps ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
-        {/* team comps LIST */}
-        {showProjects &&
-          projects?.map((project: any) => (
-            <SidebarLink
-              key={project.id}
-              icon={Briefcase}
-              label={project.name}
-              href={`/projects/${project.id}`}
-            />
-          ))}
+        {showTeamComps && (
+          <div className="px-6 py-2 text-xs text-muted-foreground">No saved comps yet.</div>
+        )}
       </div>
-      <div className="z-10 mt-32 flex w-full flex-col items-center gap-4 bg-white px-8 py-4 dark:bg-black md:hidden">
-        <div className="flex w-full items-center">
-          <div className="align-center flex h-9 w-9 justify-center">
-            <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
-          </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
 
-          </span>
+      {/* Bottom sign-out (mobile) */}
+      <div className="flex w-full flex-col items-center gap-4 border-t border-border px-6 py-4 md:hidden">
+        <div className="flex w-full items-center justify-between">
+          <span className="text-sm text-foreground">{currentUserDetails?.username}</span>
           <button
-            className="self-start rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
+            className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
             onClick={handleSignOut}
           >
             Sign out
@@ -134,23 +118,18 @@ interface SidebarLinkProps {
 
 const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
-  const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
+  const isActive = pathname === href || (href !== "/" && pathname.startsWith(href));
 
   return (
     <Link href={href} className="w-full">
       <div
-        className={`relative flex cursor-pointer items-center gap-3 transition-colors hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
-          } justify-start px-8 py-3`}
+        className={`relative flex cursor-pointer items-center gap-3 px-6 py-2.5 text-sm transition-colors
+          hover:bg-accent hover:text-accent-foreground
+          ${isActive ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground"}`}
       >
-        {isActive && (
-          <div className="absolute left-0 top-0 h-full w-1.25 bg-blue-200" />
-        )}
-
-        <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-        <span className={`font-medium text-gray-800 dark:text-gray-100`}>
-          {label}
-        </span>
+        {isActive && <div className="absolute left-0 top-0 h-full w-0.5 bg-primary" />}
+        <Icon className="h-4 w-4 shrink-0" />
+        <span>{label}</span>
       </div>
     </Link>
   );
