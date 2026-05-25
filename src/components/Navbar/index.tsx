@@ -1,20 +1,20 @@
+"use client";
+
 import React from "react";
-import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
-import Link from "next/link";
+import { Menu, Moon, Sun, User } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "../../state";
 import { useGetAuthUserQuery } from "../../state/api";
 import { signOut } from "aws-amplify/auth";
-// import Image from "next/image";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
-  const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed,
-  );
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isSidebarCollapsed = useAppSelector((state) => state.global?.isSidebarCollapsed ?? false);
+  const isDarkMode = useAppSelector((state) => state.global?.isDarkMode ?? false);
 
-  const { data: currentUser } = useGetAuthUserQuery({});
+  const { data: currentUser, isLoading } = useGetAuthUserQuery({});
+  const currentUserDetails = currentUser?.userDetails;
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -23,66 +23,48 @@ const Navbar = () => {
     }
   };
 
-  if (!currentUser) return null;
-  const currentUserDetails = currentUser?.userDetails;
-
   return (
-    <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black">
-      {/* Search Bar */}
-      <div className="flex items-center gap-8">
-        {!isSidebarCollapsed ? null : (
+    <div className="flex items-center justify-between border-b border-border bg-card px-4 py-2.5 sticky top-0 z-30">
+      <div className="flex items-center gap-3">
+        {isSidebarCollapsed && (
           <button
-            onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
+            onClick={() => dispatch(setIsSidebarCollapsed(false))}
+            className="rounded p-1.5 hover:bg-accent"
           >
-            <Menu className="h-8 w-8 dark:text-white" />
+            <Menu className="h-5 w-5 text-muted-foreground" />
           </button>
         )}
-        <div className="relative flex h-min w-50">
-          <Search className="absolute left-1 top-1/2 mr-2 h-5 w-5 -translate-y-1/2 transform cursor-pointer dark:text-white" />
-          <input
-            className="w-full rounded border-none bg-gray-100 p-2 pl-8 placeholder-gray-500 focus:border-transparent focus:outline-none dark:bg-gray-700 dark:text-white dark:placeholder-white"
-            type="search"
-            placeholder="Search..."
-          />
-        </div>
+        <span className="text-sm font-semibold text-foreground hidden md:block">Team Comp Diff</span>
       </div>
 
-      {/* Icons */}
-      <div className="flex items-center">
+      <div className="flex items-center gap-1">
         <button
           onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
-          className={
-            isDarkMode
-              ? `rounded p-2 dark:hover:bg-gray-700`
-              : `rounded p-2 hover:bg-gray-100`
-          }
+          className="rounded p-2 hover:bg-accent"
+          title="Toggle dark mode"
         >
           {isDarkMode ? (
-            <Sun className="h-6 w-6 cursor-pointer dark:text-white" />
+            <Sun className="h-4 w-4 text-muted-foreground" />
           ) : (
-            <Moon className="h-6 w-6 cursor-pointer dark:text-white" />
+            <Moon className="h-4 w-4 text-muted-foreground" />
           )}
         </button>
-        <Link
-          href="/settings"
-          className={
-            isDarkMode
-              ? `h-min w-min rounded p-2 dark:hover:bg-gray-700`
-              : `h-min w-min rounded p-2 hover:bg-gray-100`
-          }
-        >
-          <Settings className="h-6 w-6 cursor-pointer dark:text-white" />
-        </Link>
-        <div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1rem] bg-gray-200 md:inline-block"></div>
-        <div className="hidden items-center justify-between md:flex">
-          <div className="align-center flex h-9 w-9 justify-center">
-            <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
+
+        <div className="mx-2 hidden h-5 w-px bg-border md:block" />
+
+        <div className="hidden items-center gap-2 md:flex">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
+            <User className="h-3.5 w-3.5 text-primary" />
           </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
-          </span>
+          {isLoading ? (
+            <div className="h-3.5 w-20 rounded bg-muted animate-pulse" />
+          ) : (
+            <span className="text-sm text-foreground">
+              {currentUserDetails?.username ?? currentUser?.user?.username ?? "—"}
+            </span>
+          )}
           <button
-            className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
+            className="ml-1 rounded bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground hover:opacity-90"
             onClick={handleSignOut}
           >
             Sign out
