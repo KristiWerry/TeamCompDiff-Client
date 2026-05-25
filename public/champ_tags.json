@@ -1,0 +1,3882 @@
+{
+  "metadata": {
+    "game": "League of Legends",
+    "data_dragon_version": "16.9.1",
+    "generated_on": "2026-05-05",
+    "tag_policy": "Only requested tags are used in tag arrays; classifications are best-effort based on Riot Data Dragon champion stats/tags and champion kit documentation."
+  },
+  "champions": [
+    {
+      "champion": "Aatrox",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Dueling",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Ahri",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst",
+        "Reliable CC",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Akali",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Akshan",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Range",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Alistar",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Peel",
+        "Disengage",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Ambessa",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Amumu",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Anivia",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Disengage",
+        "Reliable CC",
+        "AoE",
+        "Waveclear",
+        "Peel"
+      ]
+    },
+    {
+      "champion": "Annie",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Reliable CC",
+        "Burst",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Aphelios",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Ashe",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Support"
+      ],
+      "comp": [
+        "Reliable CC",
+        "DPS",
+        "Range",
+        "Global/Semi-Global Presence",
+        "Utility",
+        "Peel"
+      ]
+    },
+    {
+      "champion": "Aurelion Sol",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "DPS",
+        "AoE",
+        "Waveclear",
+        "Global/Semi-Global Presence",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Aurora",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst",
+        "AoE",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Azir",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "AoE",
+        "Waveclear",
+        "Disengage",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Bard",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Global/Semi-Global Presence",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Bel'Veth",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Dueling",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Blitzcrank",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "Unreliable CC"
+      ]
+    },
+    {
+      "champion": "Brand",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "AoE",
+        "DPS",
+        "Waveclear",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Braum",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Frontline",
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Briar",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Dueling",
+        "Mobility",
+        "Reliable CC",
+        "Global/Semi-Global Presence"
+      ]
+    },
+    {
+      "champion": "Caitlyn",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "DPS",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Camille",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Cassiopeia",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Top"
+      ],
+      "comp": [
+        "DPS",
+        "Reliable CC",
+        "Unreliable CC",
+        "Waveclear",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Cho'Gath",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Frontline",
+        "Reliable CC",
+        "Unreliable CC",
+        "AoE",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Corki",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Physical"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "DPS",
+        "Mobility",
+        "Waveclear",
+        "Range"
+      ]
+    },
+    {
+      "champion": "Darius",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "DPS"
+      ]
+    },
+    {
+      "champion": "Diana",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Mid"
+      ],
+      "comp": [
+        "Engage",
+        "Mobility",
+        "Burst",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Dr. Mundo",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling"
+      ]
+    },
+    {
+      "champion": "Draven",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Ekko",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Elise",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Reliable CC",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Evelynn",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Ezreal",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "Poke",
+        "Mobility",
+        "Range",
+        "Global/Semi-Global Presence"
+      ]
+    },
+    {
+      "champion": "Fiddlesticks",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Reliable CC",
+        "AoE",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Fiora",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "DPS"
+      ]
+    },
+    {
+      "champion": "Fizz",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Galio",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Peel",
+        "Reliable CC",
+        "AoE",
+        "Global/Semi-Global Presence",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Gangplank",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "AoE",
+        "Waveclear",
+        "Global/Semi-Global Presence",
+        "Burst",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Garen",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Gnar",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "Unreliable CC",
+        "Range",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Gragas",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg",
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Disengage",
+        "Reliable CC",
+        "AoE",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Graves",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Dueling",
+        "Mobility",
+        "DPS",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Gwen",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Dueling",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Hecarim",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Mobility",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Heimerdinger",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid",
+        "Bot",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "AoE",
+        "Waveclear",
+        "Peel",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Hwei",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "AoE",
+        "Waveclear",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Illaoi",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Irelia",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "DPS",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Ivern",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Reliable CC",
+        "Utility",
+        "Frontline"
+      ]
+    },
+    {
+      "champion": "Janna",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Jarvan IV",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Mobility",
+        "AoE",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Jax",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "Dueling",
+        "Mobility",
+        "DPS",
+        "Reliable CC",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Jayce",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Waveclear",
+        "Burst",
+        "Mobility"
+      ]
+    },
+    {
+      "champion": "Jhin",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Reliable CC",
+        "Global/Semi-Global Presence",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Jinx",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "AoE",
+        "Global/Semi-Global Presence",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "K'Sante",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Peel",
+        "Dueling",
+        "Mobility",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Kai'Sa",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Burst",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Kalista",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Dueling",
+        "Engage",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Karma",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Peel",
+        "Disengage",
+        "Utility",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Karthus",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Mid",
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "AoE",
+        "Global/Semi-Global Presence",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Kassadin",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Katarina",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Kayle",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "Utility",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Kayn",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "Frontline"
+      ]
+    },
+    {
+      "champion": "Kennen",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Engage",
+        "Reliable CC",
+        "AoE",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Kha'Zix",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Kindred",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "Mobility",
+        "Utility",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Kled",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Mobility",
+        "Dueling",
+        "Global/Semi-Global Presence"
+      ]
+    },
+    {
+      "champion": "Kog'Maw",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Mid"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "Poke",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "LeBlanc",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst",
+        "Poke"
+      ]
+    },
+    {
+      "champion": "Lee Sin",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Engage",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Leona",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "Peel"
+      ]
+    },
+    {
+      "champion": "Lillia",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Mobility",
+        "DPS",
+        "AoE",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Lissandra",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Engage",
+        "Peel",
+        "Reliable CC",
+        "AoE",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Lucian",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Mid"
+      ],
+      "comp": [
+        "Mobility",
+        "DPS",
+        "Burst",
+        "Dueling"
+      ]
+    },
+    {
+      "champion": "Lulu",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Lux",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Reliable CC",
+        "Waveclear",
+        "Burst",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Malphite",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "AoE",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Malzahar",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Reliable CC",
+        "DPS",
+        "Waveclear",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Maokai",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Peel",
+        "Reliable CC",
+        "AoE",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Master Yi",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Dueling",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Mel",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Burst",
+        "Utility",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Milio",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Utility",
+        "Range"
+      ]
+    },
+    {
+      "champion": "Miss Fortune",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "AoE",
+        "DPS",
+        "Range",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Mordekaiser",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "DPS",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Morgana",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support",
+        "Mid",
+        "Jg"
+      ],
+      "comp": [
+        "Peel",
+        "Reliable CC",
+        "Unreliable CC",
+        "Utility",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Naafiri",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst",
+        "Dueling"
+      ]
+    },
+    {
+      "champion": "Nami",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Utility",
+        "Engage"
+      ]
+    },
+    {
+      "champion": "Nasus",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "DPS",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Nautilus",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support",
+        "Jg",
+        "Mid"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Peel",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Neeko",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Reliable CC",
+        "AoE",
+        "Burst",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Nidalee",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Poke",
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "Range"
+      ]
+    },
+    {
+      "champion": "Nilah",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "Engage",
+        "DPS",
+        "Mobility",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Nocturne",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Dueling",
+        "Burst",
+        "Global/Semi-Global Presence"
+      ]
+    },
+    {
+      "champion": "Nunu & Willump",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "Unreliable CC",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Olaf",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "DPS"
+      ]
+    },
+    {
+      "champion": "Orianna",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Peel",
+        "AoE",
+        "Waveclear",
+        "Utility",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Ornn",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "AoE",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Pantheon",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg",
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Reliable CC",
+        "Burst",
+        "Global/Semi-Global Presence"
+      ]
+    },
+    {
+      "champion": "Poppy",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Frontline",
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Dueling"
+      ]
+    },
+    {
+      "champion": "Pyke",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Mobility",
+        "Reliable CC",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Qiyana",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst",
+        "Reliable CC",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Quinn",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Mobility",
+        "Range",
+        "Dueling",
+        "Global/Semi-Global Presence",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Rakan",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Mobility",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Rammus",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Rek'Sai",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Mobility",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Rell",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support",
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Peel",
+        "Reliable CC",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Renata Glasc",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Renekton",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "Mobility",
+        "Reliable CC",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Rengar",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Dueling",
+        "Burst",
+        "Mobility"
+      ]
+    },
+    {
+      "champion": "Riven",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Rumble",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Mid",
+        "Jg"
+      ],
+      "comp": [
+        "AoE",
+        "DPS",
+        "Waveclear",
+        "Poke"
+      ]
+    },
+    {
+      "champion": "Ryze",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Top"
+      ],
+      "comp": [
+        "DPS",
+        "Waveclear",
+        "Global/Semi-Global Presence",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Samira",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "Mobility",
+        "DPS",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Sejuani",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "Peel"
+      ]
+    },
+    {
+      "champion": "Senna",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support",
+        "Bot"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Utility",
+        "DPS",
+        "Global/Semi-Global Presence"
+      ]
+    },
+    {
+      "champion": "Seraphine",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support",
+        "Mid",
+        "Bot"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "AoE",
+        "Utility",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Sett",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Dueling",
+        "Reliable CC",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Shaco",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Support"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "Unreliable CC"
+      ]
+    },
+    {
+      "champion": "Shen",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Support"
+      ],
+      "comp": [
+        "Frontline",
+        "Peel",
+        "Reliable CC",
+        "Global/Semi-Global Presence",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Shyvana",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "DPS",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Singed",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Disengage",
+        "Reliable CC",
+        "AoE",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Sion",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Sivir",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Waveclear",
+        "AoE",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Skarner",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "Peel"
+      ]
+    },
+    {
+      "champion": "Smolder",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "DPS",
+        "AoE",
+        "Range",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Sona",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Utility",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Soraka",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Swain",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support",
+        "Bot"
+      ],
+      "comp": [
+        "Frontline",
+        "Reliable CC",
+        "AoE",
+        "DPS"
+      ]
+    },
+    {
+      "champion": "Sylas",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Syndra",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Reliable CC",
+        "Burst",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Tahm Kench",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Top",
+        "Support"
+      ],
+      "comp": [
+        "Frontline",
+        "Peel",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Taliyah",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Jg"
+      ],
+      "comp": [
+        "Poke",
+        "Reliable CC",
+        "Waveclear",
+        "Global/Semi-Global Presence",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Talon",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Taric",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Teemo",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Top",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Dueling",
+        "Waveclear",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Thresh",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Unreliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Tristana",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Mid"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Range",
+        "Burst",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Trundle",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "DPS",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Tryndamere",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Dueling",
+        "Mobility",
+        "DPS",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Twisted Fate",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Reliable CC",
+        "Waveclear",
+        "Global/Semi-Global Presence",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Twitch",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Jg"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Udyr",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "Dueling",
+        "Mobility",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Urgot",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Frontline",
+        "DPS",
+        "Dueling",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Varus",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "DPS",
+        "Range",
+        "Reliable CC",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Vayne",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot",
+        "Top"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Dueling",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Veigar",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Bot"
+      ],
+      "comp": [
+        "Reliable CC",
+        "Burst",
+        "Waveclear",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Vel'Koz",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "AoE",
+        "Waveclear",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Vex",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Engage",
+        "Reliable CC",
+        "Burst",
+        "AoE",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Vi",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Mobility",
+        "Dueling",
+        "Reliable CC",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Viego",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Dueling",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Viktor",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "AoE",
+        "Waveclear",
+        "DPS",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Vladimir",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Top"
+      ],
+      "comp": [
+        "DPS",
+        "AoE",
+        "Burst",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Volibear",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Dueling",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Warwick",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top"
+      ],
+      "comp": [
+        "Engage",
+        "Dueling",
+        "Reliable CC",
+        "Global/Semi-Global Presence"
+      ]
+    },
+    {
+      "champion": "Wukong",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Reliable CC",
+        "AoE",
+        "Dueling"
+      ]
+    },
+    {
+      "champion": "Xayah",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Range",
+        "Reliable CC",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Xerath",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Support"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "AoE",
+        "Waveclear",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Xin Zhao",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Dueling",
+        "Reliable CC"
+      ]
+    },
+    {
+      "champion": "Yasuo",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Top"
+      ],
+      "comp": [
+        "Mobility",
+        "DPS",
+        "Dueling",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Yone",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Top"
+      ],
+      "comp": [
+        "Mobility",
+        "DPS",
+        "Dueling",
+        "Burst",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Yorick",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical",
+        "Tank"
+      ],
+      "primary_roles": [
+        "Top"
+      ],
+      "comp": [
+        "Dueling",
+        "Frontline",
+        "DPS",
+        "Waveclear"
+      ]
+    },
+    {
+      "champion": "Yuumi",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support"
+      ],
+      "comp": [
+        "Peel",
+        "Utility",
+        "Poke"
+      ]
+    },
+    {
+      "champion": "Zaahen",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Top",
+        "Jg"
+      ],
+      "comp": [
+        "Engage",
+        "Mobility",
+        "Dueling",
+        "DPS"
+      ]
+    },
+    {
+      "champion": "Zac",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Tank",
+        "Magic"
+      ],
+      "primary_roles": [
+        "Jg",
+        "Top",
+        "Support"
+      ],
+      "comp": [
+        "Engage",
+        "Frontline",
+        "Peel",
+        "Reliable CC",
+        "AoE"
+      ]
+    },
+    {
+      "champion": "Zed",
+      "melee_or_ranged": [
+        "Melee"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Jg"
+      ],
+      "comp": [
+        "Mobility",
+        "Dueling",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Zeri",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Late"
+      ],
+      "damage_battle_type": [
+        "Physical"
+      ],
+      "primary_roles": [
+        "Bot"
+      ],
+      "comp": [
+        "DPS",
+        "Mobility",
+        "Range",
+        "AoE",
+        "Hypercarry"
+      ]
+    },
+    {
+      "champion": "Ziggs",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid",
+        "Bot"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "AoE",
+        "Waveclear",
+        "Burst"
+      ]
+    },
+    {
+      "champion": "Zilean",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Consistent"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support",
+        "Mid"
+      ],
+      "comp": [
+        "Peel",
+        "Disengage",
+        "Reliable CC",
+        "Utility"
+      ]
+    },
+    {
+      "champion": "Zoe",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Mid"
+      ],
+      "damage_battle_type": [
+        "Magic"
+      ],
+      "primary_roles": [
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "Range",
+        "Burst",
+        "Unreliable CC"
+      ]
+    },
+    {
+      "champion": "Zyra",
+      "melee_or_ranged": [
+        "Ranged"
+      ],
+      "scaling": [
+        "Early"
+      ],
+      "damage_battle_type": [
+        "Magic",
+        "Utility"
+      ],
+      "primary_roles": [
+        "Support",
+        "Mid"
+      ],
+      "comp": [
+        "Poke",
+        "Peel",
+        "Reliable CC",
+        "AoE",
+        "Waveclear",
+        "Burst"
+      ]
+    }
+  ]
+}
