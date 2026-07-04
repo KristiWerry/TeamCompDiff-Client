@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setChampData, setNumTeammates, setQueueFilter, initMatchesFromCache } from "@/state/teamSlice";
+import { setChampData, setNumTeammates, setQueueFilter, initMatchesFromCache, saveComp } from "@/state/teamSlice";
 import { getChampIdMap, getLatestDDVersion } from "@/lib/champCache";
 import { getCachedMatches } from "@/lib/matchCache";
 import SummonerCard from "@/components/Team/SummonerCard";
 import TeamStats from "@/components/Team/TeamStats";
 import type { QueueFilter } from "@/lib/riot/types";
-import { Users } from "lucide-react";
+import { BookmarkPlus, Users } from "lucide-react";
 
 const QUEUE_OPTIONS: { value: QueueFilter; label: string }[] = [
   { value: "all",    label: "All (Ranked + Draft + Clash)" },
@@ -23,6 +23,19 @@ export default function TeamPage() {
   const numTeammates = useAppSelector((s: any) => s.team?.numTeammates ?? 1) as number;
   const slots        = useAppSelector((s: any) => s.team?.slots ?? []) as any[];
   const activeSlots  = slots.filter((s: any) => s.puuid).length;
+
+  const [savingComp, setSavingComp] = useState(false);
+  const [compName, setCompName]     = useState("");
+
+  const defaultCompName = () =>
+    slots.filter((s: any) => s.gameName).map((s: any) => s.gameName).join(", ") || "My Team Comp";
+
+  const handleSaveComp = () => {
+    const name = compName.trim() || defaultCompName();
+    dispatch(saveComp(name));
+    setSavingComp(false);
+    setCompName("");
+  };
 
   // Hydrate matches from localStorage cache on mount
   useEffect(() => {
@@ -62,7 +75,7 @@ export default function TeamPage() {
           )}
         </div>
 
-        {/* Filters — only shown once at least one summoner is added */}
+        {/* Filters + Save Comp — only shown once at least one summoner is added */}
         {activeSlots > 0 && (
           <div className="flex flex-wrap items-center gap-3">
             {/* Num Teammates */}
@@ -97,6 +110,44 @@ export default function TeamPage() {
                 <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
+
+            {/* Save comp */}
+            {savingComp ? (
+              <div className="flex items-center gap-1.5">
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder={defaultCompName()}
+                  value={compName}
+                  onChange={(e) => setCompName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSaveComp();
+                    if (e.key === "Escape") { setSavingComp(false); setCompName(""); }
+                  }}
+                  className="w-40 rounded-md border border-input bg-background px-2 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+                <button
+                  onClick={handleSaveComp}
+                  className="rounded-md bg-primary px-2.5 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => { setSavingComp(false); setCompName(""); }}
+                  className="rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setSavingComp(true)}
+                className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-accent"
+              >
+                <BookmarkPlus className="h-3.5 w-3.5" />
+                Save Comp
+              </button>
+            )}
           </div>
         )}
       </div>

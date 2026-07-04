@@ -28,8 +28,18 @@ export interface SummonerSlot {
   error?: string;
 }
 
+export interface SavedComp {
+  id: string;
+  name: string;
+  createdAt: number;
+  slots: SummonerSlot[];
+  queueFilter: "all" | "ranked" | "draft" | "clash";
+  numTeammates: number;
+}
+
 export interface TeamState {
   slots: SummonerSlot[];
+  savedComps: SavedComp[];
   // Match data — NOT persisted (lives in localStorage, loaded on mount)
   matches: Record<string, MatchData>;
   // DDragon data — NOT persisted, fetched fresh
@@ -55,6 +65,7 @@ const EMPTY_SLOT = (slotIndex: number): SummonerSlot => ({
 
 const initialState: TeamState = {
   slots: Array.from({ length: 5 }, (_, i) => EMPTY_SLOT(i)),
+  savedComps: [],
   matches: {},
   champIdToName: {},
   ddVersion: "",
@@ -143,6 +154,30 @@ const teamSlice = createSlice({
     initMatchesFromCache(state, action: PayloadAction<Record<string, MatchData>>) {
       state.matches = action.payload;
     },
+
+    saveComp(state, action: PayloadAction<string>) {
+      state.savedComps.push({
+        id: Date.now().toString(),
+        name: action.payload,
+        createdAt: Date.now(),
+        slots: state.slots.map((s) => ({ ...s })),
+        queueFilter: state.queueFilter,
+        numTeammates: state.numTeammates,
+      });
+    },
+
+    deleteComp(state, action: PayloadAction<string>) {
+      state.savedComps = state.savedComps.filter((c) => c.id !== action.payload);
+    },
+
+    loadComp(state, action: PayloadAction<string>) {
+      const comp = state.savedComps.find((c) => c.id === action.payload);
+      if (comp) {
+        state.slots = comp.slots.map((s) => ({ ...s }));
+        state.queueFilter = comp.queueFilter;
+        state.numTeammates = comp.numTeammates;
+      }
+    },
   },
 });
 
@@ -159,6 +194,9 @@ export const {
   setNumTeammates,
   setChampData,
   initMatchesFromCache,
+  saveComp,
+  deleteComp,
+  loadComp,
 } = teamSlice.actions;
 
 export default teamSlice.reducer;

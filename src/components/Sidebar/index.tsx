@@ -3,6 +3,7 @@
 import { useAppDispatch, useAppSelector } from "../../app/redux";
 import { setIsSidebarCollapsed } from "../../state";
 import { useGetAuthUserQuery } from "../../state/api";
+import { loadComp, type SavedComp } from "../../state/teamSlice";
 import { signOut } from "aws-amplify/auth";
 import {
   BarChart3,
@@ -11,20 +12,18 @@ import {
   Home,
   LucideIcon,
   Search,
-  Settings2,
   User,
   Users,
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const Sidebar = () => {
-  const [showTeamComps, setShowTeamComps] = useState(false);
-
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector((state: any) => state.global?.isSidebarCollapsed ?? false);
+  const savedComps = useAppSelector((state: any) => (state.team?.savedComps ?? []) as SavedComp[]);
   const { data: currentUser, isLoading } = useGetAuthUserQuery({});
   const currentUserDetails = currentUser?.userDetails;
 
@@ -75,23 +74,11 @@ const Sidebar = () => {
         {/* Nav links */}
         <nav className="z-10 w-full mt-2">
           <SidebarLink icon={Home} label="Team Analysis" href="/" />
-          <SidebarLink icon={Search} label="Opponent Scouting" href="/scouting" />
-          <SidebarLink icon={BarChart3} label="Team Comps" href="/comps" />
+          <TeamCompsNavItem savedComps={savedComps} />
           <SidebarLink icon={Users} label="Draft" href="/draft" />
-          <SidebarLink icon={Settings2} label="Account" href="/account" />
+          <SidebarLink icon={Search} label="Opponent Scouting" href="/scouting" />
+          <SidebarLink icon={User} label="Profile" href="/profile" />
         </nav>
-
-        {/* Team Comps section (future) */}
-        <button
-          onClick={() => setShowTeamComps((prev) => !prev)}
-          className="flex w-full items-center justify-between px-6 py-3 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <span>Saved Comps</span>
-          {showTeamComps ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </button>
-        {showTeamComps && (
-          <div className="px-6 py-2 text-xs text-muted-foreground">No saved comps yet.</div>
-        )}
       </div>
 
       {/* Bottom sign-out (mobile) */}
@@ -132,6 +119,77 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
         <span>{label}</span>
       </div>
     </Link>
+  );
+};
+
+const TeamCompsNavItem = ({ savedComps }: { savedComps: SavedComp[] }) => {
+  const pathname = usePathname();
+  const dispatch  = useAppDispatch();
+  const router    = useRouter();
+  const isActive  = pathname === "/comps";
+  const [isExpanded, setIsExpanded] = useState(isActive);
+
+  // Auto-expand when the user navigates to /comps
+  useEffect(() => {
+    if (isActive) setIsExpanded(true);
+  }, [isActive]);
+
+  const handleLoadComp = (id: string) => {
+    dispatch(loadComp(id));
+    router.push("/");
+  };
+
+  return (
+    <div>
+      <div
+        className={`relative flex items-center text-sm transition-colors
+          hover:bg-accent hover:text-accent-foreground
+          ${isActive ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground"}`}
+      >
+        {isActive && <div className="absolute left-0 top-0 h-full w-0.5 bg-primary" />}
+        {/* Clicking the label+icon area navigates to /comps */}
+        <Link href="/comps" className="flex flex-1 items-center gap-3 px-6 py-2.5 min-w-0">
+          <BarChart3 className="h-4 w-4 shrink-0" />
+          <span>Team Comps</span>
+          {savedComps.length > 0 && (
+            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
+              {savedComps.length}
+            </span>
+          )}
+        </Link>
+        {/* Chevron toggles the sub-list without navigating */}
+        <button
+          onClick={() => setIsExpanded((prev) => !prev)}
+          className="pr-5 py-2.5 pl-1 shrink-0"
+          aria-label="Toggle saved comps"
+        >
+          {isExpanded
+            ? <ChevronUp className="h-3.5 w-3.5" />
+            : <ChevronDown className="h-3.5 w-3.5" />}
+        </button>
+      </div>
+
+      {isExpanded && (
+        <div className="flex flex-col pb-1">
+          {savedComps.length === 0 ? (
+            <p className="py-1.5 pl-13 pr-6 text-xs text-muted-foreground">
+              No saved comps yet.
+            </p>
+          ) : (
+            savedComps.map((comp) => (
+              <button
+                key={comp.id}
+                onClick={() => handleLoadComp(comp.id)}
+                title="Load into Team Analysis"
+                className="flex w-full items-center py-1.5 pl-13 pr-6 text-left text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <span className="truncate">{comp.name}</span>
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
