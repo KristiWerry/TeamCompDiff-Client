@@ -1,173 +1,225 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import type { Role } from "@/lib/riot/types";
 
-export interface Project {
-  id: number;
-  name: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
+// ── Champion data ──────────────────────────────────────────────────────────
+
+export interface ChampionData {
+  name: string;    // display name e.g. "Wukong" (key in data is the DDragon id e.g. "MonkeyKing")
+  roles: string[]; // backend may return "bot" — map to "adc" on use
+  tags: string[];
+  powerSpike: string;
+  [key: string]: unknown;
 }
 
-export enum Priority {
-  Urgent = "Urgent",
-  High = "High",
-  Medium = "Medium",
-  Low = "Low",
-  Backlog = "Backlog",
+// ── Profile ────────────────────────────────────────────────────────────────
+
+export interface UserProfile {
+  champPool: string[];
+  preferredRole: Role | null;
+  preferredSecondaryRole: Role | null;
+  displayName: string | null;
 }
 
-export enum Status {
-  ToDo = "To Do",
-  WorkInProgress = "Work In Progress",
-  UnderReview = "Under Review",
-  Completed = "Completed",
+// ── Players ────────────────────────────────────────────────────────────────
+
+export interface LinkedRiotAccount {
+  riotId: string;
+  puuid: string;
+  summonerId: string;
+  linkedAt: string;
 }
 
-export interface User {
-  userId?: number;
+export interface RefreshCacheResult {
+  refreshed: { riotId: string; champsTracked: number }[];
+}
+
+// ── Team Comp algorithm ────────────────────────────────────────────────────
+
+export interface PlayerInput {
+  primaryRole: Role;
+  secondaryRole?: Role;
+  champPool?: string[];
+  riotId?: string;
+}
+
+export interface CompSuggestion {
+  champion: string;
+  score: number;
+  winRate: string | null;
+  masteryLevel: number | null;
+  impactNote: string;
+}
+
+export interface CompPick {
+  role: string;
+  player: string | null;
+  suggestions: CompSuggestion[];
+}
+
+export interface SynergyPair {
+  roles: string[];
+  champions: string[];
+  score: number;
+}
+
+export interface CompAnalysis {
+  difficulty: number;
+  winConditions: string[];
+  powerSpike: "early" | "mid" | "late" | "mixed";
+  synergies: { overall: number; pairs: SynergyPair[] };
+  suggestedPlaystyle: string;
+  engage: "Low" | "Medium" | "High" | "Very High";
+}
+
+export interface GeneratedComp {
+  archetype: string;
+  description: string;
+  roleAssignment: Record<string, string>;
+  picks: CompPick[];
+  analysis: CompAnalysis;
+  cacheAgesAt: Record<string, string>;
+}
+
+export interface TeamCompResponse {
+  comps: GeneratedComp[];
+  lastRunAt?: string;
+}
+
+// ── Saved comps ────────────────────────────────────────────────────────────
+
+export interface SavedComp {
   username: string;
-  email: string;
-  profilePictureUrl?: string;
-  cognitoId?: string;
-  teamId?: number;
+  compId: string;
+  compName: string;
+  comp: GeneratedComp;
+  savedAt: string;
+  queryId?: string;
 }
 
-export interface Attachment {
-  id: number;
-  fileURL: string;
-  fileName: string;
-  taskId: number;
-  uploadedById: number;
+// ── Saved queries ──────────────────────────────────────────────────────────
+
+export interface SavedQuery {
+  username: string;
+  queryId: string;
+  queryName: string;
+  players: PlayerInput[];
+  createdAt: string;
+  lastRunAt: string | null;
+  lastResult: TeamCompResponse | null;
 }
 
-export interface Task {
-  id: number;
-  title: string;
-  description?: string;
-  status?: Status;
-  priority?: Priority;
-  tags?: string;
-  startDate?: string;
-  dueDate?: string;
-  points?: number;
-  projectId: number;
-  authorUserId?: number;
-  assignedUserId?: number;
-
-  author?: User;
-  assignee?: User;
-  comments?: Comment[];
-  attachments?: Attachment[];
-}
-
-export interface SearchResults {
-  tasks?: Task[];
-  projects?: Project[];
-  users?: User[];
-}
-
-export interface Team {
-  teamId: number;
-  teamName: string;
-  productOwnerUserId?: number;
-  projectManagerUserId?: number;
-}
+// ── API ────────────────────────────────────────────────────────────────────
 
 export const api = createApi({
+  reducerPath: "api",
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
     prepareHeaders: async (headers) => {
       const session = await fetchAuthSession();
-      const { accessToken } = session.tokens ?? {};
-      if (accessToken) {
-        headers.set("Authorization", `Bearer ${accessToken}`);
+      const token = session.tokens?.idToken?.toString();
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
     },
   }),
-  reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ["Profile", "Comps", "Queries"],
   endpoints: (build) => ({
-    getAuthUser: build.query({
-      queryFn: async (_, _queryApi, _extraoptions, fetchWithBQ) => {
+
+    // Auth user (Cognito identity only)
+    getAuthUser: build.query<{ user: any; userSub: string | null }, void>({
+      queryFn: async () => {
         try {
           const user = await getCurrentUser();
           const session = await fetchAuthSession();
-          if (!session) throw new Error("No session found");
-          const { userSub } = session;
-          const { accessToken } = session.tokens ?? {};
-
-          const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
-          const userDetails = userDetailsResponse.data as User;
-
-          return { data: { user, userSub, userDetails } };
+          return { data: { user, userSub: session.userSub ?? null } };
         } catch (error: any) {
-          return { error: error.message || "Could not fetch user data" };
+          return { error: error.message || "Could not fetch user" };
         }
       },
     }),
-    getProjects: build.query<Project[], void>({
-      query: () => "projects",
-      providesTags: ["Projects"],
+
+    // Champions (public — no auth required)
+    getChampions: build.query<{ data: Record<string, ChampionData> }, void>({
+      query: () => "/champions",
     }),
-    createProject: build.mutation<Project, Partial<Project>>({
-      query: (project) => ({
-        url: "projects",
-        method: "POST",
-        body: project,
-      }),
-      invalidatesTags: ["Projects"],
+
+    // Profile
+    getProfile: build.query<UserProfile, void>({
+      query: () => "/profile",
+      providesTags: ["Profile"],
     }),
-    getTasks: build.query<Task[], { projectId: number }>({
-      query: ({ projectId }) => `tasks?projectId=${projectId}`,
-      providesTags: (result) =>
-        result ? result.map(({ id }) => ({ type: "Tasks" as const, id })) : [{ type: "Tasks" as const }],
+    updateProfile: build.mutation<UserProfile, Partial<UserProfile>>({
+      query: (body) => ({ url: "/profile", method: "PUT", body }),
+      invalidatesTags: ["Profile"],
     }),
-    getTasksByUser: build.query<Task[], number>({
-      query: (userId) => `tasks/user/${userId}`,
-      providesTags: (result, error, userId) =>
-        result ? result.map(({ id }) => ({ type: "Tasks", id })) : [{ type: "Tasks", id: userId }],
+
+    // Players
+    linkRiotAccount: build.mutation<LinkedRiotAccount, { riotId: string }>({
+      query: (body) => ({ url: "/players/link-riot", method: "POST", body }),
     }),
-    createTask: build.mutation<Task, Partial<Task>>({
-      query: (task) => ({
-        url: "tasks",
-        method: "POST",
-        body: task,
-      }),
-      invalidatesTags: ["Tasks"],
+    refreshCache: build.mutation<RefreshCacheResult, void>({
+      query: () => ({ url: "/players/refresh-cache", method: "POST" }),
     }),
-    updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
-      query: ({ taskId, status }) => ({
-        url: `tasks/${taskId}/status`,
-        method: "PATCH",
-        body: { status },
-      }),
-      invalidatesTags: (result, error, { taskId }) => [{ type: "Tasks", id: taskId }],
+
+    // Team Comp algorithm
+    runTeamComp: build.mutation<TeamCompResponse, { players: PlayerInput[] }>({
+      query: (body) => ({ url: "/team-comp", method: "POST", body }),
     }),
-    getUsers: build.query<User[], void>({
-      query: () => "users",
-      providesTags: ["Users"],
+
+    // Comps
+    getComps: build.query<{ comps: SavedComp[] }, void>({
+      query: () => "/comps",
+      providesTags: ["Comps"],
     }),
-    getTeams: build.query<Team[], void>({
-      query: () => "teams",
-      providesTags: ["Teams"],
+    saveComp: build.mutation<SavedComp, { compName: string; comp: GeneratedComp; queryId?: string }>({
+      query: (body) => ({ url: "/comps", method: "POST", body }),
+      invalidatesTags: ["Comps"],
     }),
-    search: build.query<SearchResults, string>({
-      query: (query) => `search?query=${query}`,
+    deleteComp: build.mutation<{ deleted: boolean; compId: string }, string>({
+      query: (compId) => ({ url: `/comps/${compId}`, method: "DELETE" }),
+      invalidatesTags: ["Comps"],
+    }),
+
+    // Queries
+    getQueries: build.query<{ queries: SavedQuery[] }, void>({
+      query: () => "/queries",
+      providesTags: ["Queries"],
+    }),
+    createQuery: build.mutation<SavedQuery, { queryName: string; players: PlayerInput[] }>({
+      query: (body) => ({ url: "/queries", method: "POST", body }),
+      invalidatesTags: ["Queries"],
+    }),
+    updateQuery: build.mutation<SavedQuery, { queryId: string; queryName?: string; players?: PlayerInput[] }>({
+      query: ({ queryId, ...body }) => ({ url: `/queries/${queryId}`, method: "PUT", body }),
+      invalidatesTags: ["Queries"],
+    }),
+    deleteQuery: build.mutation<{ deleted: boolean; queryId: string }, string>({
+      query: (queryId) => ({ url: `/queries/${queryId}`, method: "DELETE" }),
+      invalidatesTags: ["Queries"],
+    }),
+    runQuery: build.mutation<TeamCompResponse & { lastRunAt: string }, string>({
+      query: (queryId) => ({ url: `/queries/${queryId}/run`, method: "POST" }),
+      invalidatesTags: ["Queries"],
     }),
   }),
 });
 
 export const {
-  useGetProjectsQuery,
-  useCreateProjectMutation,
-  useGetTasksQuery,
-  useCreateTaskMutation,
-  useUpdateTaskStatusMutation,
-  useSearchQuery,
-  useGetUsersQuery,
-  useGetTeamsQuery,
-  useGetTasksByUserQuery,
   useGetAuthUserQuery,
+  useGetChampionsQuery,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+  useLinkRiotAccountMutation,
+  useRefreshCacheMutation,
+  useRunTeamCompMutation,
+  useGetCompsQuery,
+  useSaveCompMutation,
+  useDeleteCompMutation,
+  useGetQueriesQuery,
+  useCreateQueryMutation,
+  useUpdateQueryMutation,
+  useDeleteQueryMutation,
+  useRunQueryMutation,
 } = api;

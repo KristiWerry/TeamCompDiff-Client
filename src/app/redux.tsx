@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef } from "react";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
@@ -7,12 +9,14 @@ import {
   Provider,
 } from "react-redux";
 import globalReducer from "../state";
+import teamReducer, { TeamState } from "../state/teamSlice";
 import { api } from "../state/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
 import {
   persistStore,
   persistReducer,
+  createTransform,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -23,40 +27,42 @@ import {
 import { PersistGate } from "redux-persist/integration/react";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
-/* REDUX PERSISTENCE */
-const createNoopStorage = () => {
-  return {
-    getItem(_key: any) {
-      return Promise.resolve(null);
-    },
-    setItem(_key: any, value: any) {
-      return Promise.resolve(value);
-    },
-    removeItem(_key: any) {
-      return Promise.resolve();
-    },
-  };
-};
+const createNoopStorage = () => ({
+  getItem(_key: any)         { return Promise.resolve(null); },
+  setItem(_key: any, val: any) { return Promise.resolve(val); },
+  removeItem(_key: any)      { return Promise.resolve(); },
+});
 
 const storage =
-  typeof window === "undefined"
-    ? createNoopStorage()
-    : createWebStorage("local");
+  typeof window === "undefined" ? createNoopStorage() : createWebStorage("local");
+
+// Strip runtime-only fields — champions and matches are fetched fresh on load
+const teamTransform = createTransform<TeamState, Omit<TeamState, "matches" | "champions">>(
+  (inbound) => {
+    const { matches: _m, champions: _c, ...rest } = inbound;
+    return rest;
+  },
+  (outbound) => ({ ...outbound, matches: {}, champions: {} }),
+  { whitelist: ["team"] }
+);
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["global"],
+  whitelist: ["global", "team"],
+  transforms: [teamTransform],
 };
+
 const rootReducer = combineReducers({
   global: globalReducer,
+  team:   teamReducer,
   [api.reducerPath]: api.reducer,
 });
-const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-/* REDUX STORE */
-export const makeStore = () => {
-  return configureStore({
+const persistedReducer = persistReducer(persistConfig, rootReducer as any);
+
+export const makeStore = () =>
+  configureStore({
     reducer: persistedReducer,
     middleware: (getDefault) =>
       getDefault({
@@ -65,21 +71,14 @@ export const makeStore = () => {
         },
       }).concat(api.middleware),
   });
-};
 
-/* REDUX TYPES */
-export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore["getState"]>;
+export type AppStore    = ReturnType<typeof makeStore>;
+export type RootState   = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-/* PROVIDER */
-export default function StoreProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function StoreProvider({ children }: { children: React.ReactNode }) {
   const storeRef = useRef<AppStore | null>(null);
   if (!storeRef.current) {
     storeRef.current = makeStore();

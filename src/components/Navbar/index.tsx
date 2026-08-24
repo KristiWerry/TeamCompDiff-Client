@@ -1,89 +1,144 @@
-import React from "react";
-import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
-import Link from "next/link";
+"use client";
+
+import { Menu, Moon, Sun, User } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "../../state";
 import { useGetAuthUserQuery } from "../../state/api";
 import { signOut } from "aws-amplify/auth";
-// import Image from "next/image";
+import { Oxanium } from "next/font/google";
+
+const oxanium = Oxanium({ subsets: ["latin"], weight: ["700", "800"] });
 
 const Navbar = () => {
-  const dispatch = useAppDispatch();
-  const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed,
-  );
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const dispatch           = useAppDispatch();
+  const isSidebarCollapsed = useAppSelector((state: any) => state.global?.isSidebarCollapsed ?? false);
+  const isDarkMode         = useAppSelector((state: any) => state.global?.isDarkMode ?? false);
 
-  const { data: currentUser } = useGetAuthUserQuery({});
+  const { data: currentUser, isLoading } = useGetAuthUserQuery(undefined);
+  const displayName = currentUser?.user?.username ?? "—";
+
   const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error("Error signing out: ", error);
-    }
+    try { await signOut(); } catch (error) { console.error("Error signing out: ", error); }
   };
 
-  if (!currentUser) return null;
-  const currentUserDetails = currentUser?.userDetails;
-
   return (
-    <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black">
-      {/* Search Bar */}
-      <div className="flex items-center gap-8">
-        {!isSidebarCollapsed ? null : (
+    <div
+      className={`flex items-center justify-between px-4 py-2.5 sticky top-0 z-30
+        ${isDarkMode ? "" : "bg-card border-b border-border"}`}
+      style={isDarkMode ? { background: "#0d0d14", borderBottom: "1px solid rgba(255,255,255,0.07)" } : undefined}
+    >
+      {/* Left: menu toggle + brand when sidebar is collapsed */}
+      <div className="flex items-center gap-3">
+        {isSidebarCollapsed && (
           <button
-            onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
+            onClick={() => dispatch(setIsSidebarCollapsed(false))}
+            className={`flex h-8 w-8 items-center justify-center rounded transition-all duration-150
+              ${isDarkMode ? "" : "hover:bg-accent text-muted-foreground hover:text-foreground"}`}
+            style={isDarkMode ? {
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              color: "rgba(255,255,255,0.5)",
+            } : undefined}
+            onMouseEnter={isDarkMode ? (e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.8)";
+            } : undefined}
+            onMouseLeave={isDarkMode ? (e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+            } : undefined}
           >
-            <Menu className="h-8 w-8 dark:text-white" />
+            <Menu className="h-4 w-4" />
           </button>
         )}
-        <div className="relative flex h-min w-50">
-          <Search className="absolute left-1 top-1/2 mr-2 h-5 w-5 -translate-y-1/2 transform cursor-pointer dark:text-white" />
-          <input
-            className="w-full rounded border-none bg-gray-100 p-2 pl-8 placeholder-gray-500 focus:border-transparent focus:outline-none dark:bg-gray-700 dark:text-white dark:placeholder-white"
-            type="search"
-            placeholder="Search..."
-          />
-        </div>
+
+        {isSidebarCollapsed && (
+          <div className={`${oxanium.className} text-sm font-black uppercase tracking-tight select-none hidden md:block`}>
+            {isDarkMode ? (
+              <>
+                <span style={{ color: "rgba(255,255,255,0.85)" }}>Team Comp </span>
+                <span style={{
+                  backgroundImage: "linear-gradient(90deg, rgba(139,92,246,1) 0%, rgba(167,139,250,1) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}>Diff</span>
+              </>
+            ) : (
+              <>
+                <span className="text-foreground">Team Comp </span>
+                <span className="text-primary">Diff</span>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Icons */}
-      <div className="flex items-center">
+      {/* Right: dark mode toggle + user */}
+      <div className="flex items-center gap-2">
+        {/* Dark mode toggle */}
         <button
           onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
-          className={
-            isDarkMode
-              ? `rounded p-2 dark:hover:bg-gray-700`
-              : `rounded p-2 hover:bg-gray-100`
-          }
+          className={`flex h-8 w-8 items-center justify-center rounded transition-all duration-150
+            ${isDarkMode ? "" : "hover:bg-accent text-muted-foreground hover:text-foreground"}`}
+          style={isDarkMode ? {
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.07)",
+            color: "rgba(255,255,255,0.4)",
+          } : undefined}
+          onMouseEnter={isDarkMode ? (e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+            e.currentTarget.style.color = "rgba(255,255,255,0.7)";
+          } : undefined}
+          onMouseLeave={isDarkMode ? (e) => {
+            e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+            e.currentTarget.style.color = "rgba(255,255,255,0.4)";
+          } : undefined}
+          title="Toggle dark mode"
         >
-          {isDarkMode ? (
-            <Sun className="h-6 w-6 cursor-pointer dark:text-white" />
-          ) : (
-            <Moon className="h-6 w-6 cursor-pointer dark:text-white" />
-          )}
+          {isDarkMode ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
         </button>
-        <Link
-          href="/settings"
-          className={
-            isDarkMode
-              ? `h-min w-min rounded p-2 dark:hover:bg-gray-700`
-              : `h-min w-min rounded p-2 hover:bg-gray-100`
-          }
-        >
-          <Settings className="h-6 w-6 cursor-pointer dark:text-white" />
-        </Link>
-        <div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1rem] bg-gray-200 md:inline-block"></div>
-        <div className="hidden items-center justify-between md:flex">
-          <div className="align-center flex h-9 w-9 justify-center">
-            <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
+
+        {/* Divider */}
+        <div
+          className={`hidden h-5 w-px md:block ${isDarkMode ? "" : "bg-border"}`}
+          style={isDarkMode ? { background: "rgba(255,255,255,0.08)" } : undefined}
+        />
+
+        {/* User info */}
+        <div className="hidden items-center gap-2 md:flex">
+          <div
+            className={`flex h-7 w-7 items-center justify-center rounded-full ${isDarkMode ? "" : "bg-primary/10"}`}
+            style={isDarkMode ? { background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)" } : undefined}
+          >
+            <User
+              className={`h-3.5 w-3.5 ${isDarkMode ? "" : "text-primary"}`}
+              style={isDarkMode ? { color: "rgba(167,139,250,0.9)" } : undefined}
+            />
           </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
-          </span>
+
+          {isLoading ? (
+            <div
+              className={`h-3 w-20 rounded animate-pulse ${isDarkMode ? "" : "bg-muted"}`}
+              style={isDarkMode ? { background: "rgba(255,255,255,0.08)" } : undefined}
+            />
+          ) : (
+            <span
+              className={`text-xs font-medium ${isDarkMode ? "" : "text-foreground"}`}
+              style={isDarkMode ? { color: "rgba(255,255,255,0.55)" } : undefined}
+            >
+              {displayName}
+            </span>
+          )}
+
           <button
-            className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
             onClick={handleSignOut}
+            className={`ml-1 rounded px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-opacity hover:opacity-90
+              ${isDarkMode ? "text-white" : "bg-primary text-primary-foreground"}`}
+            style={isDarkMode ? {
+              background: "linear-gradient(135deg, rgba(139,92,246,1) 0%, rgba(99,60,220,1) 100%)",
+              boxShadow: "0 0 12px rgba(139,92,246,0.25)",
+            } : undefined}
           >
             Sign out
           </button>
