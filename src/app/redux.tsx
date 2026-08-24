@@ -36,13 +36,13 @@ const createNoopStorage = () => ({
 const storage =
   typeof window === "undefined" ? createNoopStorage() : createWebStorage("local");
 
-// Strip runtime-only fields from team state so we don't persist large match data
-const teamTransform = createTransform<TeamState, Omit<TeamState, "matches" | "champIdToName" | "ddVersion">>(
+// Strip runtime-only fields — champions and matches are fetched fresh on load
+const teamTransform = createTransform<TeamState, Omit<TeamState, "matches" | "champions">>(
   (inbound) => {
-    const { matches: _m, champIdToName: _c, ddVersion: _d, ...rest } = inbound;
+    const { matches: _m, champions: _c, ...rest } = inbound;
     return rest;
   },
-  (outbound) => ({ ...outbound, matches: {}, champIdToName: {}, ddVersion: "" }),
+  (outbound) => ({ ...outbound, matches: {}, champions: {} }),
   { whitelist: ["team"] }
 );
 

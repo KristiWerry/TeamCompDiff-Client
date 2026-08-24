@@ -5,6 +5,16 @@ export type Region =
 
 export type QueueFilter = "all" | "ranked" | "draft" | "clash";
 
+export type Role = "top" | "jungle" | "mid" | "adc" | "support" | "fill";
+
+export const ROLE_LABELS: Record<Role, string> = {
+  top: "Top", jungle: "Jungle", mid: "Mid", adc: "ADC", support: "Support", fill: "Fill",
+};
+
+// ALL_ROLES lists the 5 real positions (used for champion filtering, etc.)
+// "fill" is a valid Role but is handled separately in UI components
+export const ALL_ROLES: Role[] = ["top", "jungle", "mid", "adc", "support"];
+
 // Season timestamps (Unix seconds)
 export const SEASON_2025_START = 1736380800; // Jan 9 2025 00:00 UTC
 export const SEASON_2024_START = 1704844800; // Jan 10 2024 00:00 UTC

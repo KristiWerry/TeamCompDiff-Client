@@ -1,60 +1,54 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { ChampionMastery, MatchData, RankEntry, Region } from "@/lib/riot/types";
+import type { ChampionMastery, MatchData, RankEntry } from "@/lib/riot/types";
+import type { Role } from "@/lib/riot/types";
+import type { ChampionData, PlayerInput } from "@/state/api";
 
 export type { QueueFilter } from "@/lib/riot/types";
 
 export interface SummonerSlot {
   slotIndex: number;
+  // Riot identity (riotId = `${gameName}#${tagLine}`)
   gameName: string;
   tagLine: string;
-  region: Region;
-  // Data from Riot API
+  // Algorithm inputs
+  primaryRole?: Role;
+  secondaryRole?: Role;
+  slotChampPool: string[]; // champion names for the algorithm
+  // Legacy Riot API data — kept but not actively fetched
   puuid?: string;
   summonerId?: string;
   profileIconId?: number;
   summonerLevel?: number;
   rankInfo?: RankEntry[];
-  championPool?: ChampionMastery[];    // from mastery API, enriched with champion names
-  // User editable
-  customChampPool?: ChampionMastery[]; // manually curated pool
-  previousSeasonRank?: string;         // manual input; not available from Riot API
-  // Match loading state
+  championPool?: ChampionMastery[];
+  customChampPool?: ChampionMastery[];
+  previousSeasonRank?: string;
   matchIds: string[];
   matchesLoaded: number;
   matchesTotal: number;
   matchesLoading: boolean;
-  prevSeasonLoaded: boolean;           // whether previous season matches have been fetched
+  prevSeasonLoaded: boolean;
   loaded: boolean;
   error?: string;
 }
 
-export interface SavedComp {
-  id: string;
-  name: string;
-  createdAt: number;
-  slots: SummonerSlot[];
-  queueFilter: "all" | "ranked" | "draft" | "clash";
-  numTeammates: number;
-}
-
 export interface TeamState {
   slots: SummonerSlot[];
-  savedComps: SavedComp[];
-  // Match data — NOT persisted (lives in localStorage, loaded on mount)
+  myRiotId: string | null; // logged-in user's linked Riot ID ("name#tag")
+  // Champion data from backend GET /champions — NOT persisted
+  champions: Record<string, ChampionData>;
+  // Legacy match data — NOT persisted
   matches: Record<string, MatchData>;
-  // DDragon data — NOT persisted, fetched fresh
-  champIdToName: Record<number, string>; // { 266: "Aatrox" }
-  ddVersion: string;
   // Filters
   queueFilter: "all" | "ranked" | "draft" | "clash";
-  numTeammates: number; // 1–5
+  numTeammates: number;
 }
 
 const EMPTY_SLOT = (slotIndex: number): SummonerSlot => ({
   slotIndex,
   gameName: "",
   tagLine: "",
-  region: "NA1",
+  slotChampPool: [],
   matchIds: [],
   matchesLoaded: 0,
   matchesTotal: 0,
@@ -65,10 +59,9 @@ const EMPTY_SLOT = (slotIndex: number): SummonerSlot => ({
 
 const initialState: TeamState = {
   slots: Array.from({ length: 5 }, (_, i) => EMPTY_SLOT(i)),
-  savedComps: [],
+  myRiotId: null,
+  champions: {},
   matches: {},
-  champIdToName: {},
-  ddVersion: "",
   queueFilter: "all",
   numTeammates: 1,
 };
@@ -89,6 +82,45 @@ const teamSlice = createSlice({
       state.slots[action.payload] = EMPTY_SLOT(action.payload);
     },
 
+    setSlotRole(state, action: PayloadAction<{ slotIndex: number; role: Role | undefined }>) {
+      state.slots[action.payload.slotIndex].primaryRole = action.payload.role;
+    },
+
+    setSlotSecondaryRole(
+      state,
+      action: PayloadAction<{ slotIndex: number; role: Role | undefined }>
+    ) {
+      state.slots[action.payload.slotIndex].secondaryRole = action.payload.role;
+    },
+
+    setSlotChampPool(
+      state,
+      action: PayloadAction<{ slotIndex: number; pool: string[] }>
+    ) {
+      state.slots[action.payload.slotIndex].slotChampPool = action.payload.pool;
+    },
+
+    setMyRiotId(state, action: PayloadAction<string | null>) {
+      state.myRiotId = action.payload;
+    },
+
+    // Restore saved query players into slots
+    loadQueryPlayers(state, action: PayloadAction<PlayerInput[]>) {
+      action.payload.forEach((player, i) => {
+        if (i >= 5) return;
+        const [gameName, tagLine] = (player.riotId ?? "#").split("#");
+        state.slots[i] = {
+          ...EMPTY_SLOT(i),
+          gameName: gameName ?? "",
+          tagLine: tagLine ?? "",
+          primaryRole: player.primaryRole,
+          secondaryRole: player.secondaryRole,
+          slotChampPool: player.champPool ?? [],
+        };
+      });
+    },
+
+    // Legacy actions — kept for old Riot API flow
     addMatchIds(
       state,
       action: PayloadAction<{ slotIndex: number; matchIds: string[] }>
@@ -142,41 +174,13 @@ const teamSlice = createSlice({
       state.numTeammates = Math.max(1, Math.min(5, action.payload));
     },
 
-    setChampData(
-      state,
-      action: PayloadAction<{ champIdToName: Record<number, string>; ddVersion: string }>
-    ) {
-      state.champIdToName = action.payload.champIdToName;
-      state.ddVersion = action.payload.ddVersion;
+    // Champions from backend GET /champions (not persisted)
+    setChampions(state, action: PayloadAction<Record<string, ChampionData>>) {
+      state.champions = action.payload;
     },
 
-    // Called on page mount to hydrate matches from localStorage
     initMatchesFromCache(state, action: PayloadAction<Record<string, MatchData>>) {
       state.matches = action.payload;
-    },
-
-    saveComp(state, action: PayloadAction<string>) {
-      state.savedComps.push({
-        id: Date.now().toString(),
-        name: action.payload,
-        createdAt: Date.now(),
-        slots: state.slots.map((s) => ({ ...s })),
-        queueFilter: state.queueFilter,
-        numTeammates: state.numTeammates,
-      });
-    },
-
-    deleteComp(state, action: PayloadAction<string>) {
-      state.savedComps = state.savedComps.filter((c) => c.id !== action.payload);
-    },
-
-    loadComp(state, action: PayloadAction<string>) {
-      const comp = state.savedComps.find((c) => c.id === action.payload);
-      if (comp) {
-        state.slots = comp.slots.map((s) => ({ ...s }));
-        state.queueFilter = comp.queueFilter;
-        state.numTeammates = comp.numTeammates;
-      }
     },
   },
 });
@@ -184,6 +188,11 @@ const teamSlice = createSlice({
 export const {
   setSummonerData,
   clearSlot,
+  setSlotRole,
+  setSlotSecondaryRole,
+  setSlotChampPool,
+  setMyRiotId,
+  loadQueryPlayers,
   addMatchIds,
   addMatches,
   setMatchesLoaded,
@@ -192,11 +201,8 @@ export const {
   setPreviousSeasonRank,
   setQueueFilter,
   setNumTeammates,
-  setChampData,
+  setChampions,
   initMatchesFromCache,
-  saveComp,
-  deleteComp,
-  loadComp,
 } = teamSlice.actions;
 
 export default teamSlice.reducer;
