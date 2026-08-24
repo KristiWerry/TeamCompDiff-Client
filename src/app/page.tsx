@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Oxanium } from "next/font/google";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setChampions, initMatchesFromCache } from "@/state/teamSlice";
@@ -23,6 +23,7 @@ import {
   ChevronUp,
   Loader2,
   Play,
+  RefreshCw,
   Save,
   Swords,
   Target,
@@ -63,138 +64,660 @@ const FEATURES = [
   },
 ];
 
-// ── Comp result card ──────────────────────────────────────────────────────
+// ── Comp card helpers ─────────────────────────────────────────────────────
+
+const DDRAG_ICON    = (id: string) =>
+  `https://ddragon.leagueoflegends.com/cdn/16.16.1/img/champion/${id}.png`;
+const DDRAG_LOADING = (id: string) =>
+  `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${id}_0.jpg`;
+
+
+const CDRAG_POS =
+  "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions";
+const ROLE_POS: Record<string, string> = {
+  top: "top", jungle: "jungle", mid: "middle", adc: "bottom", support: "utility",
+};
+const roleIconUrl = (role: string) =>
+  `${CDRAG_POS}/icon-position-${ROLE_POS[role] ?? role}.png`;
+
+const ROLE_COLORS: Record<string, string> = {
+  top:     "239,68,68",
+  jungle:  "34,197,94",
+  mid:     "139,92,246",
+  adc:     "245,158,11",
+  support: "59,130,246",
+};
+
+const ARCHETYPE_CFG: Record<string, { color: string; bg: string; border: string; bar: string }> = {
+  "Teamfight":    { color: "#60A5FA", bg: "rgba(59,130,246,0.12)",  border: "rgba(59,130,246,0.3)",  bar: "linear-gradient(90deg,#3B82F6,#60A5FA)" },
+  "Poke / Siege": { color: "#FBBF24", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  bar: "linear-gradient(90deg,#F59E0B,#FBBF24)" },
+  "Pick Comp":    { color: "#F87171", bg: "rgba(239,68,68,0.12)",   border: "rgba(239,68,68,0.3)",   bar: "linear-gradient(90deg,#EF4444,#F87171)" },
+  "Split Push":   { color: "#34D399", bg: "rgba(16,185,129,0.12)",  border: "rgba(16,185,129,0.3)",  bar: "linear-gradient(90deg,#10B981,#34D399)" },
+  "Early Game":   { color: "#FB923C", bg: "rgba(249,115,22,0.12)",  border: "rgba(249,115,22,0.3)",  bar: "linear-gradient(90deg,#F97316,#FB923C)" },
+};
+const DEFAULT_CFG = {
+  color: "#A78BFA", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)", bar: "linear-gradient(90deg,#8B5CF6,#A78BFA)",
+};
+const archetypeCfg = (a: string) => ARCHETYPE_CFG[a] ?? DEFAULT_CFG;
+
+const POWER_SPIKE_CFG: Record<string, { bg: string; color: string; label: string }> = {
+  early: { bg: "rgba(249,115,22,0.15)", color: "#FB923C", label: "Early game" },
+  mid:   { bg: "rgba(234,179,8,0.15)",  color: "#FACC15", label: "Mid game"   },
+  late:  { bg: "rgba(59,130,246,0.15)", color: "#60A5FA", label: "Late game"  },
+  mixed: { bg: "rgba(139,92,246,0.15)", color: "#A78BFA", label: "Mixed"      },
+};
+
+const ENGAGE_CFG: Record<string, { bg: string; color: string }> = {
+  "Low":       { bg: "rgba(100,116,139,0.15)", color: "#94A3B8" },
+  "Medium":    { bg: "rgba(234,179,8,0.15)",   color: "#FACC15" },
+  "High":      { bg: "rgba(249,115,22,0.15)",  color: "#FB923C" },
+  "Very High": { bg: "rgba(239,68,68,0.15)",   color: "#F87171" },
+};
+
+const computeOverallScore = (comp: GeneratedComp) =>
+  Math.round(
+    (comp.picks.reduce((sum, p) => sum + (p.suggestions[0]?.score ?? 0), 0) / 5 / 10 * 50) +
+    (comp.analysis.synergies.overall / 10 * 50)
+  );
+
+// Synergy: higher = better. Matches bar gradient: light blue → indigo → violet.
+const synergyPill = (s: number) =>
+  s >= 7.5 ? { bg: "rgba(124,58,237,0.15)",  color: "#A78BFA" }  // violet  — excellent
+  : s >= 5  ? { bg: "rgba(129,140,248,0.15)", color: "#818CF8" }  // indigo  — decent
+  :           { bg: "rgba(125,211,252,0.15)", color: "#7DD3FC" };  // sky     — weak
+
+// Difficulty: lower = easier = better. Green → yellow → red palette.
+const difficultyPill = (d: number) =>
+  d <= 3 ? { bg: "rgba(52,211,153,0.15)",  color: "#34D399" }  // green  — easy
+  : d <= 6 ? { bg: "rgba(250,204,21,0.15)", color: "#FACC15" }  // yellow — moderate
+  :          { bg: "rgba(248,113,113,0.15)", color: "#F87171" }; // red    — hard
+
+// ── NameModal ─────────────────────────────────────────────────────────────
+
+function NameModal({
+  title,
+  placeholder,
+  confirmLabel = "Save",
+  onConfirm,
+  onCancel,
+  loading = false,
+  dm,
+}: {
+  title: string;
+  placeholder: string;
+  confirmLabel?: string;
+  onConfirm: (name: string) => void;
+  onCancel: () => void;
+  loading?: boolean;
+  dm: boolean;
+}) {
+  const [value, setValue] = useState("");
+
+  const handleConfirm = () => {
+    if (!value.trim()) return;
+    onConfirm(value.trim());
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+      onClick={(e) => { if (e.target === e.currentTarget && !loading) onCancel(); }}
+    >
+      <div
+        className={`w-full max-w-sm mx-4 rounded-2xl p-6 shadow-2xl ${dm ? "" : "bg-card border border-border"}`}
+        style={dm ? {
+          background: "#0d0d14",
+          border: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 24px 60px rgba(0,0,0,0.7)",
+        } : undefined}
+      >
+        <h3
+          className={`text-base font-bold mb-1 ${dm ? "" : "text-foreground"}`}
+          style={dm ? { color: "rgba(255,255,255,0.92)" } : undefined}
+        >
+          {title}
+        </h3>
+        <p
+          className={`text-xs mb-4 ${dm ? "" : "text-muted-foreground"}`}
+          style={dm ? { color: "rgba(255,255,255,0.4)" } : undefined}
+        >
+          Give it a name you&apos;ll recognise later.
+        </p>
+        <input
+          autoFocus
+          type="text"
+          placeholder={placeholder}
+          value={value}
+          disabled={loading}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleConfirm();
+            if (e.key === "Escape" && !loading) onCancel();
+          }}
+          className={`w-full rounded-lg px-3 py-2.5 text-sm mb-5 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 ${dm ? "" : "bg-background border border-input text-foreground"}`}
+          style={dm ? {
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            color: "rgba(255,255,255,0.9)",
+          } : undefined}
+        />
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 border border-border text-muted-foreground hover:text-foreground hover:border-border/80 dark:border-white/10 dark:text-white/40 dark:hover:border-white/25 dark:hover:text-white/75"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={loading || !value.trim()}
+            className="rounded-lg px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+            style={{ background: "linear-gradient(135deg, rgba(139,92,246,1) 0%, rgba(99,60,220,1) 100%)" }}
+          >
+            {loading ? "Saving…" : confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Synergy pair bars ─────────────────────────────────────────────────────
+
+function SynergyPairs({
+  comp,
+  nameToId,
+  dm,
+  color,
+}: {
+  comp: GeneratedComp;
+  nameToId: Record<string, string>;
+  dm: boolean;
+  color: string;
+}) {
+  const pairs = [...(comp.analysis.synergies.pairs ?? [])]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+
+  if (pairs.length === 0) {
+    return (
+      <p className="text-xs" style={{ color: dm ? "rgba(255,255,255,0.3)" : undefined }}>
+        No synergy data available.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3 w-full">
+      {pairs.map((pair, i) => {
+        const [c1, c2] = pair.champions;
+        const id1 = nameToId[c1], id2 = nameToId[c2];
+        const pct = Math.min(Math.round((pair.score / 10) * 100), 100);
+
+        return (
+          <div key={i} className="flex items-center gap-3">
+            {/* Overlapping champion square icons */}
+            <div className="flex shrink-0 items-center">
+              <div
+                className="h-9 w-9 rounded-md overflow-hidden"
+                style={{ border: `2px solid ${color}66`, background: dm ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }}
+              >
+                {id1 && <img src={DDRAG_ICON(id1)} alt={c1} className="h-full w-full object-cover" />}
+              </div>
+              <div
+                className="h-9 w-9 rounded-md overflow-hidden -ml-2"
+                style={{ border: `2px solid ${color}66`, background: dm ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)" }}
+              >
+                {id2 && <img src={DDRAG_ICON(id2)} alt={c2} className="h-full w-full object-cover" />}
+              </div>
+            </div>
+
+            {/* Names + score bar */}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold leading-tight truncate" style={{ color: dm ? "rgba(255,255,255,0.8)" : undefined }}>
+                {c1} + {c2}
+              </p>
+              <div
+                className="mt-1 h-1 w-full rounded-full overflow-hidden"
+                style={{ background: dm ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)" }}
+              >
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${pct}%`, background: color }}
+                />
+              </div>
+            </div>
+
+            <span className="text-xs font-bold tabular-nums shrink-0" style={{ color }}>
+              {pair.score.toFixed(1)}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── StatPill ──────────────────────────────────────────────────────────────
+
+function StatPill({ bg, color, children }: { bg: string; color: string; children: React.ReactNode }) {
+  return (
+    <span
+      className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+      style={{ background: bg, color }}
+    >
+      {children}
+    </span>
+  );
+}
+
+// ── CompCard ──────────────────────────────────────────────────────────────
+
+const ROLES = ["top", "jungle", "mid", "adc", "support"] as const;
 
 function CompCard({
   comp,
   onSave,
+  nameToId,
+  dm,
 }: {
   comp: GeneratedComp;
   onSave: (comp: GeneratedComp, name: string) => Promise<void>;
+  nameToId: Record<string, string>;
+  dm: boolean;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const [saving, setSaving]     = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [compName, setCompName] = useState("");
+  const [expanded, setExpanded]       = useState(false);
+  const [saving, setSaving]           = useState(false);
+  const [isSaving, setIsSaving]       = useState(false);
+  const [rerollIdx, setRerollIdx]     = useState([0, 0, 0, 0, 0]);
+  const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
 
-  const handleSave = async () => {
+  const cfg          = archetypeCfg(comp.archetype);
+  const psConfig     = POWER_SPIKE_CFG[comp.analysis.powerSpike] ?? POWER_SPIKE_CFG.mixed;
+  const engConfig    = ENGAGE_CFG[comp.analysis.engage]          ?? ENGAGE_CFG["Low"];
+  const overallScore = computeOverallScore(comp);
+
+  const handleSave = async (name: string) => {
     setIsSaving(true);
-    await onSave(comp, compName.trim() || `${comp.archetype} Comp`);
+    await onSave(comp, name || `${comp.archetype} Comp`);
     setIsSaving(false);
     setSaving(false);
-    setCompName("");
   };
 
+  const divStyle = dm ? { background: "rgba(255,255,255,0.06)" } : undefined;
+
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <div>
-          <span className={`${oxanium.className} font-bold uppercase tracking-wide text-foreground`}>
+    <div
+      className={`rounded-xl overflow-hidden ${dm ? "" : "bg-card border border-border shadow-sm"}`}
+      style={dm ? { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" } : undefined}
+    >
+      {/* Archetype accent bar */}
+      <div className="h-0.5" style={{ background: cfg.bar }} />
+
+      {/* Header row: archetype + stat tags + save + expand */}
+      <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span
+            className={`${oxanium.className} inline-flex items-center rounded-full px-3 py-0.5 text-xs font-bold uppercase tracking-widest shrink-0`}
+            style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}
+          >
             {comp.archetype}
           </span>
-          <span className="ml-2 text-xs text-muted-foreground">· {comp.description}</span>
+          <StatPill bg={psConfig.bg} color={psConfig.color}>{psConfig.label}</StatPill>
+          <StatPill bg={engConfig.bg} color={engConfig.color}>{comp.analysis.engage} engage</StatPill>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Difficulty {comp.analysis.difficulty}/10</span>
-          <button onClick={() => setExpanded((p) => !p)} className="p-1 rounded hover:bg-accent">
-            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setSaving((p) => !p)}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold text-white transition-all hover:opacity-90 hover:shadow-[0_0_14px_rgba(139,92,246,0.4)] active:scale-95"
+            style={{ background: "linear-gradient(135deg, rgba(139,92,246,1) 0%, rgba(99,60,220,1) 100%)" }}
+          >
+            <BookmarkPlus className="h-3 w-3" />
+            Save
+          </button>
+          <button
+            onClick={() => setExpanded((p) => !p)}
+            className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors
+              ${dm ? "" : "bg-muted hover:bg-accent text-muted-foreground hover:text-foreground"}`}
+            style={dm ? { background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)" } : undefined}
+            onMouseEnter={dm ? (e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "rgba(255,255,255,0.75)"; } : undefined}
+            onMouseLeave={dm ? (e) => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; } : undefined}
+            aria-label={expanded ? "Collapse" : "Expand"}
+          >
+            {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-5 divide-x divide-border border-b border-border">
-        {["top", "jungle", "mid", "adc", "support"].map((role) => {
-          const pick = comp.picks.find((p) => p.role === role);
-          const top  = pick?.suggestions?.[0];
+      {/* Save comp modal */}
+      {saving && (
+        <NameModal
+          title="Save Comp"
+          placeholder={`${comp.archetype} Comp`}
+          confirmLabel="Save"
+          onConfirm={handleSave}
+          onCancel={() => setSaving(false)}
+          loading={isSaving}
+          dm={dm}
+        />
+      )}
+
+      {/* Score bar */}
+      <div className="px-5 pb-3">
+        <div className="flex items-center gap-3 mb-1.5">
+          <span
+            className={`text-[10px] font-bold uppercase tracking-widest ${dm ? "" : "text-muted-foreground"}`}
+            style={dm ? { color: "rgba(255,255,255,0.3)" } : undefined}
+          >
+            Overall Score
+          </span>
+          <span className="text-xl font-black tabular-nums leading-none" style={{ color: cfg.color }}>
+            {overallScore}%
+          </span>
+        </div>
+        <div
+          className={`h-1.5 w-full rounded-full overflow-hidden ${dm ? "" : "bg-muted"}`}
+          style={dm ? { background: "rgba(255,255,255,0.07)" } : undefined}
+        >
+          <div
+            className="h-full rounded-full transition-all duration-700"
+            style={{ width: `${overallScore}%`, background: cfg.bar }}
+          />
+        </div>
+      </div>
+
+      {/* Description */}
+      <p
+        className={`px-5 pb-4 text-sm leading-relaxed ${dm ? "" : "text-muted-foreground"}`}
+        style={dm ? { color: "rgba(255,255,255,0.5)" } : undefined}
+      >
+        {comp.description}
+      </p>
+
+      {/* Divider */}
+      <div className={`mx-5 h-px ${dm ? "" : "bg-border"}`} style={divStyle} />
+
+      {/* Champion banner row */}
+      <div className="grid grid-cols-5 gap-2 px-4 pt-3 pb-4">
+        {ROLES.map((role, rIdx) => {
+          const pick      = comp.picks.find((p) => p.role === role);
+          const suggIdx   = rerollIdx[rIdx];
+          const sugg      = pick?.suggestions?.[suggIdx];
+          const champId   = sugg?.champion ? nameToId[sugg.champion] : undefined;
+          const canReroll = (pick?.suggestions?.length ?? 0) > 1;
+          const isHovered = hoveredSlot === rIdx;
+
+          // Solid bg color used for the fade-in/out gradients so they blend seamlessly
+          const bannerBg = dm ? "#0c0c1a" : "#e8eaf0";
+
           return (
-            <div key={role} className="px-2 py-2 text-center">
-              <div className="text-[10px] text-muted-foreground uppercase tracking-widest mb-0.5">{role}</div>
-              <div className="text-xs font-bold text-foreground truncate">{top?.champion ?? "—"}</div>
-              {top?.winRate && <div className="text-[10px] text-muted-foreground">{top.winRate}</div>}
+            <div key={role} className="flex flex-col items-center gap-2">
+              {/* Outer wrapper — drop-shadow provides the colored glow border */}
+              <div
+                className="relative w-full"
+                onMouseEnter={() => setHoveredSlot(rIdx)}
+                onMouseLeave={() => setHoveredSlot(null)}
+                style={{
+                  aspectRatio: "2/3",
+                  transition: "filter 0.45s ease",
+                  filter: sugg
+                    ? isHovered
+                      ? `drop-shadow(0 0 5px ${cfg.color}) drop-shadow(0 0 18px ${cfg.color}88)`
+                      : `drop-shadow(0 0 2px ${cfg.color}) drop-shadow(0 0 10px ${cfg.border})`
+                    : `drop-shadow(0 0 1px rgba(255,255,255,0.1))`,
+                }}
+              >
+                {/* Inner banner — clipped to pointed/chevron shape */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    clipPath: "polygon(0 0, 100% 0, 100% 86%, 50% 100%, 0 86%)",
+                    background: bannerBg,
+                  }}
+                >
+                  {/* Champion loading screen art */}
+                  {champId && (
+                    <img
+                      src={DDRAG_LOADING(champId)}
+                      alt={sugg?.champion}
+                      className="absolute inset-0 h-full w-full object-cover object-top"
+                      style={{
+                        transform: isHovered ? "scale(1.07)" : "scale(1)",
+                        transition: "transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
+                      }}
+                    />
+                  )}
+
+                  {/* Top fade — art fades into solid background */}
+                  <div
+                    className="absolute inset-x-0 top-0"
+                    style={{
+                      height: "32%",
+                      background: `linear-gradient(to bottom, ${bannerBg} 0%, transparent 100%)`,
+                    }}
+                  />
+
+                  {/* Bottom fade — art fades into solid background for text zone */}
+                  <div
+                    className="absolute inset-x-0 bottom-0"
+                    style={{
+                      height: "52%",
+                      background: `linear-gradient(to top, ${bannerBg} 0%, ${bannerBg} 18%, transparent 100%)`,
+                    }}
+                  />
+
+                  {/* Side accent lines */}
+                  <div className="absolute inset-y-0 left-0 w-px" style={{ background: cfg.color, opacity: 0.75 }} />
+                  <div className="absolute inset-y-0 right-0 w-px" style={{ background: cfg.color, opacity: 0.75 }} />
+
+                  {/* Role icon — top center, colored circle per role */}
+                  <div className="absolute top-2 inset-x-0 flex justify-center">
+                    <div
+                      className="flex items-center justify-center rounded-full h-8 w-8"
+                      style={{
+                        background: `rgba(${ROLE_COLORS[role] ?? "255,255,255"}, 0.2)`,
+                        border: `1.5px solid rgba(${ROLE_COLORS[role] ?? "255,255,255"}, 0.55)`,
+                        boxShadow: `0 0 8px rgba(${ROLE_COLORS[role] ?? "255,255,255"}, 0.25)`,
+                      }}
+                    >
+                      <img
+                        src={roleIconUrl(role)}
+                        alt={role}
+                        className="h-5 w-5"
+                        style={{ filter: "grayscale(1) brightness(4)", opacity: 0.9 }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Alt pick badge — top right */}
+                  {suggIdx > 0 && (
+                    <div
+                      className="absolute top-2 right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold"
+                      style={{ background: "rgba(0,0,0,0.75)", color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.2)" }}
+                    >
+                      {suggIdx + 1}
+                    </div>
+                  )}
+
+                  {/* Bottom text — sits in the solid zone above the point */}
+                  <div
+                    className="absolute inset-x-0 text-center"
+                    style={{ bottom: "17%", padding: "0 6px" }}
+                  >
+                    <div
+                      className="text-[9px] font-semibold uppercase tracking-widest truncate mb-0.5"
+                      style={{ color: dm ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)" }}
+                    >
+                      {sugg?.champion ?? "—"}
+                    </div>
+                    <div
+                      className="text-[11px] font-bold uppercase tracking-wide truncate"
+                      style={{
+                        color: dm ? "rgba(255,255,255,0.92)" : "rgba(0,0,0,0.85)",
+                        textShadow: dm ? "0 1px 6px rgba(0,0,0,0.9)" : "none",
+                      }}
+                    >
+                      {pick?.player ?? "Fill"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Re-roll button — gold, only visible when accordion is open */}
+              {expanded && (
+                canReroll ? (
+                  <button
+                    onClick={() =>
+                      setRerollIdx((prev) => {
+                        const n = [...prev];
+                        n[rIdx] = (n[rIdx] + 1) % (pick?.suggestions.length ?? 1);
+                        return n;
+                      })
+                    }
+                    className="flex h-6 w-6 items-center justify-center rounded-full transition-all hover:scale-110"
+                    style={{
+                      background: "rgba(245,158,11,0.15)",
+                      border: "1px solid rgba(245,158,11,0.4)",
+                      color: "#F59E0B",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(245,158,11,0.3)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(245,158,11,0.15)"; }}
+                    title="Try next pick"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                  </button>
+                ) : (
+                  <div className="h-6" />
+                )
+              )}
             </div>
           );
         })}
       </div>
 
+      {/* Expanded section */}
       {expanded && (
-        <div className="p-4 space-y-4">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
-              Win Conditions
-            </p>
-            <ul className="space-y-1">
-              {comp.analysis.winConditions.map((wc, i) => (
-                <li key={i} className="text-xs text-muted-foreground flex gap-1.5">
-                  <span className="text-primary shrink-0">·</span>{wc}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-            <span>Power spike: <span className="text-foreground font-medium capitalize">{comp.analysis.powerSpike}</span></span>
-            <span>Engage: <span className="text-foreground font-medium">{comp.analysis.engage}</span></span>
-            <span>Synergy: <span className="text-foreground font-medium">{comp.analysis.synergies.overall}/10</span></span>
-          </div>
-          <div className="space-y-2">
-            {comp.picks.map((pick) => (
-              <div key={pick.role} className="rounded-lg bg-muted/30 px-3 py-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{pick.role}</span>
-                  {pick.player && <span className="text-[10px] text-muted-foreground">— {pick.player}</span>}
+        <>
+          <div className={`mx-5 h-px ${dm ? "" : "bg-border"}`} style={divStyle} />
+          <div className="p-5 space-y-4">
+
+            {/* Synergy + Difficulty bars */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                {
+                  label: "Synergy",
+                  value: comp.analysis.synergies.overall,
+                  pct: comp.analysis.synergies.overall * 10,
+                  barGradient: "linear-gradient(90deg, #7DD3FC 0%, #818CF8 50%, #7C3AED 100%)",
+                  barGlow: "rgba(129,140,248,0.55)",
+                  ...synergyPill(comp.analysis.synergies.overall),
+                },
+                {
+                  label: "Difficulty",
+                  value: comp.analysis.difficulty,
+                  pct: comp.analysis.difficulty * 10,
+                  barGradient: null,
+                  barGlow: null,
+                  ...difficultyPill(comp.analysis.difficulty),
+                },
+              ].map(({ label, value, pct, color, barGradient, barGlow }) => (
+                <div
+                  key={label}
+                  className="rounded-lg p-4"
+                  style={{
+                    background: dm ? "rgba(255,255,255,0.03)" : undefined,
+                    border: `1.5px solid ${cfg.border}`,
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-2.5">
+                    <p className="text-xs font-bold uppercase tracking-widest" style={{ color: cfg.color }}>
+                      {label}
+                    </p>
+                    <span className="text-sm font-black tabular-nums" style={{ color }}>
+                      {value.toFixed(1)}
+                      <span className="text-[10px] font-normal" style={{ opacity: 0.55 }}>/10</span>
+                    </span>
+                  </div>
+                  <div
+                    className="h-4 w-full rounded-full overflow-hidden"
+                    style={{ background: dm ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)" }}
+                  >
+                    <div
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${pct}%`,
+                        background: barGradient ?? `linear-gradient(90deg, ${color}88, ${color})`,
+                        boxShadow: `0 0 10px ${barGlow ?? color + "55"}`,
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  {pick.suggestions.map((s, i) => (
-                    <div key={i} className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-xs font-medium text-foreground">{s.champion}</span>
-                        <span className="ml-1.5 text-[10px] text-muted-foreground">{s.impactNote}</span>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-xs font-bold text-foreground">{s.score.toFixed(1)}</span>
-                        {s.winRate && <div className="text-[10px] text-muted-foreground">{s.winRate}</div>}
-                      </div>
-                    </div>
-                  ))}
+              ))}
+            </div>
+
+            {/* 2-column: Win Conditions + Playstyle | Synergy pairs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Left: Win Conditions + Playstyle */}
+              <div className="space-y-3">
+                <div
+                  className="rounded-lg p-4"
+                  style={{
+                    background: dm ? "rgba(255,255,255,0.03)" : undefined,
+                    border: `1.5px solid ${cfg.border}`,
+                  }}
+                >
+                  <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: cfg.color }}>
+                    Win Conditions
+                  </p>
+                  <ul className="space-y-1.5">
+                    {comp.analysis.winConditions.map((wc, i) => (
+                      <li key={i} className="flex gap-2 text-sm">
+                        <span className="shrink-0 font-bold leading-5" style={{ color: cfg.color }}>·</span>
+                        <span className={dm ? "" : "text-foreground"} style={dm ? { color: "rgba(255,255,255,0.7)" } : undefined}>
+                          {wc}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div
+                  className="rounded-lg p-4"
+                  style={{
+                    background: dm ? "rgba(255,255,255,0.03)" : undefined,
+                    border: `1.5px solid ${cfg.border}`,
+                  }}
+                >
+                  <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: cfg.color }}>
+                    Suggested Playstyle
+                  </p>
+                  <p className="text-sm italic" style={dm ? { color: "rgba(255,255,255,0.55)" } : undefined}>
+                    {comp.analysis.suggestedPlaystyle}
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground italic">{comp.analysis.suggestedPlaystyle}</p>
-        </div>
-      )}
 
-      <div className="border-t border-border px-4 py-2 flex items-center gap-2">
-        {saving ? (
-          <>
-            <input
-              autoFocus type="text" placeholder={`${comp.archetype} Comp`}
-              value={compName}
-              disabled={isSaving}
-              onChange={(e) => setCompName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape" && !isSaving) setSaving(false); }}
-              className="flex-1 rounded border border-input bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="rounded bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? "Saving…" : "Save"}
-            </button>
-            <button
-              onClick={() => setSaving(false)}
-              disabled={isSaving}
-              className="rounded border border-border px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <button onClick={() => setSaving(true)} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-            <BookmarkPlus className="h-3.5 w-3.5" />Save comp
-          </button>
-        )}
-      </div>
+              {/* Right: Champion Synergies */}
+              <div
+                className="rounded-lg p-4"
+                style={{
+                  background: dm ? "rgba(255,255,255,0.03)" : undefined,
+                  border: `1.5px solid ${cfg.border}`,
+                }}
+              >
+                <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: cfg.color }}>
+                  Champion Synergies
+                </p>
+                <SynergyPairs comp={comp} nameToId={nameToId} dm={dm} color={cfg.color} />
+              </div>
+
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -206,19 +729,26 @@ export default function TeamPage() {
   const slots      = useAppSelector((s: any) => s.team?.slots ?? []) as any[];
   const isDarkMode = useAppSelector((s: any) => s.global?.isDarkMode ?? false);
 
-  // A slot is valid when it has both a primary role AND at least one champion
   const validSlots = slots.filter((s: any) => s.primaryRole && s.slotChampPool?.length > 0).length;
 
   const { data: champData } = useGetChampionsQuery();
 
+  const nameToId = useMemo(
+    () =>
+      Object.entries(champData?.data ?? {}).reduce(
+        (acc: Record<string, string>, [id, data]) => { acc[data.name] = id; return acc; },
+        {}
+      ),
+    [champData]
+  );
+
   const [runTeamComp, { isLoading: running }] = useRunTeamCompMutation();
-  const [saveComp] = useSaveCompMutation();
+  const [saveComp]                            = useSaveCompMutation();
   const [createQuery, { isLoading: savingQueryRequest }] = useCreateQueryMutation();
-  const [results, setResults]                  = useState<TeamCompResponse | null>(null);
-  const [runError, setRunError]                = useState("");
-  const [savingQuery, setSavingQuery]          = useState(false);
-  const [queryName, setQueryName]              = useState("");
-  const [toast, setToast]                      = useState("");
+  const [results, setResults]                 = useState<TeamCompResponse | null>(null);
+  const [runError, setRunError]               = useState("");
+  const [savingQuery, setSavingQuery]         = useState(false);
+  const [toast, setToast]                     = useState("");
   const [lastSavedSlotsJson, setLastSavedSlotsJson] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -270,37 +800,38 @@ export default function TeamPage() {
     }
   };
 
-  const handleSaveComp  = async (comp: GeneratedComp, name: string) => {
+  const handleSaveComp = async (comp: GeneratedComp, name: string) => {
     const result = await saveComp({ compName: name, comp }).unwrap().catch(() => null);
     if (result !== null) showToast("Comp saved!");
   };
 
-  const handleSaveQuery = async () => {
+  const handleSaveQuery = async (name: string) => {
     const players = buildPlayers();
-    if (!queryName.trim() || players.length === 0) return;
-    const result = await createQuery({ queryName: queryName.trim(), players }).unwrap().catch(() => null);
+    if (!name || players.length === 0) return;
+    const result = await createQuery({ queryName: name, players }).unwrap().catch(() => null);
     setSavingQuery(false);
-    setQueryName("");
     if (result !== null) {
       showToast("Query saved!");
       setLastSavedSlotsJson(JSON.stringify(slots));
     }
   };
 
+  // Sort comps by overall score descending
+  const sortedComps = useMemo(
+    () => [...(results?.comps ?? [])].sort((a, b) => computeOverallScore(b) - computeOverallScore(a)),
+    [results]
+  );
+
   return (
     <div className="space-y-10 pb-6">
 
       {/* ── Hero ── */}
       <div className="space-y-4">
-        {/* Title */}
         <h1 className={`${oxanium.className} text-5xl sm:text-6xl font-extrabold uppercase leading-none tracking-tight`}>
           <span className="text-foreground">Team </span>
           <span className="text-gradient-primary">Generator</span>
         </h1>
-
-        {/* Gradient separator */}
         <div className="h-px w-full bg-linear-to-r from-primary/70 via-teal-500/30 to-transparent" />
-
         <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
           Configure up to 5 player slots with roles and champion pools. Our algorithm analyzes
           synergies, damage spread, and win conditions to generate the strongest compositions
@@ -314,9 +845,7 @@ export default function TeamPage() {
           <div
             key={f.label}
             className={`group relative overflow-hidden rounded-xl p-5 cursor-default transition-[transform] duration-300
-              ${isDarkMode
-                ? "bg-zinc-900/50 border border-zinc-800/80"
-                : "bg-card border border-border"}`}
+              ${isDarkMode ? "bg-zinc-900/50 border border-zinc-800/80" : "bg-card border border-border"}`}
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLDivElement;
               el.style.borderColor = f.borderColor;
@@ -330,7 +859,6 @@ export default function TeamPage() {
               el.style.transform   = "";
             }}
           >
-            {/* Expanding colored bar — the key differentiator */}
             <div
               className={`h-0.5 mb-5 rounded-full ${f.barClass} transition-all duration-500 ease-out`}
               style={{ width: "1.5rem" }}
@@ -344,13 +872,10 @@ export default function TeamPage() {
                 card.addEventListener("mouseleave", shrink);
               }}
             />
-
             <f.Icon className={`h-7 w-7 ${f.colorClass} mb-3 transition-transform duration-300 group-hover:scale-110`} />
-
             <p className={`${oxanium.className} text-[11px] font-bold uppercase tracking-widest ${f.colorClass} mb-2`}>
               {f.label}
             </p>
-
             <p className="text-xs text-muted-foreground leading-relaxed">{f.desc}</p>
           </div>
         ))}
@@ -392,29 +917,15 @@ export default function TeamPage() {
         )}
 
         {savingQuery && (
-          <div className="flex items-center gap-2">
-            <input
-              autoFocus type="text" placeholder="Query name…" value={queryName}
-              disabled={savingQueryRequest}
-              onChange={(e) => setQueryName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSaveQuery(); if (e.key === "Escape" && !savingQueryRequest) setSavingQuery(false); }}
-              className="w-44 rounded border border-input bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <button
-              onClick={handleSaveQuery}
-              disabled={savingQueryRequest}
-              className="rounded bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {savingQueryRequest ? "Saving…" : "Save"}
-            </button>
-            <button
-              onClick={() => setSavingQuery(false)}
-              disabled={savingQueryRequest}
-              className="rounded border border-border px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-          </div>
+          <NameModal
+            title="Save Query"
+            placeholder="Query name…"
+            confirmLabel="Save"
+            onConfirm={handleSaveQuery}
+            onCancel={() => setSavingQuery(false)}
+            loading={savingQueryRequest}
+            dm={isDarkMode}
+          />
         )}
 
         {runError && <p className="text-xs text-destructive">{runError}</p>}
@@ -422,24 +933,26 @@ export default function TeamPage() {
 
       {/* ── Toast ── */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-lg px-4 py-3 shadow-xl text-sm font-semibold text-white"
-          style={{ background: "rgba(22,163,74,0.95)", backdropFilter: "blur(8px)" }}>
+        <div
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-lg px-4 py-3 shadow-xl text-sm font-semibold text-white"
+          style={{ background: "rgba(22,163,74,0.95)", backdropFilter: "blur(8px)" }}
+        >
           <CheckCircle className="h-4 w-4 shrink-0" />
           {toast}
         </div>
       )}
 
       {/* ── Results ── */}
-      {results && (
+      {sortedComps.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-end gap-3">
             <h2 className={`${oxanium.className} text-2xl font-bold uppercase tracking-wide text-foreground`}>
-              {results.comps.length} Comp{results.comps.length !== 1 ? "s" : ""} Generated
+              {sortedComps.length} Comp{sortedComps.length !== 1 ? "s" : ""} Generated
             </h2>
             <div className="mb-1 h-px flex-1 bg-linear-to-r from-primary/40 to-transparent" />
           </div>
-          {results.comps.map((comp, i) => (
-            <CompCard key={i} comp={comp} onSave={handleSaveComp} />
+          {sortedComps.map((comp, i) => (
+            <CompCard key={i} comp={comp} onSave={handleSaveComp} nameToId={nameToId} dm={isDarkMode} />
           ))}
         </div>
       )}

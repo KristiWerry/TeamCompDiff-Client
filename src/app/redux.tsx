@@ -78,13 +78,15 @@ export type AppDispatch = AppStore["dispatch"];
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-export default function StoreProvider({ children }: { children: React.ReactNode }) {
-  const storeRef = useRef<AppStore | null>(null);
+export default function ReduxProvider({ children }: { children: React.ReactNode }) {
+  const storeRef     = useRef<AppStore | null>(null);
+  const persistorRef = useRef<ReturnType<typeof persistStore> | null>(null);
   if (!storeRef.current) {
-    storeRef.current = makeStore();
+    storeRef.current     = makeStore();
+    persistorRef.current = persistStore(storeRef.current);
     setupListeners(storeRef.current.dispatch);
   }
-  const persistor = persistStore(storeRef.current);
+  const persistor = persistorRef.current!;
 
   return (
     <Provider store={storeRef.current}>

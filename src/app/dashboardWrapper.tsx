@@ -2,9 +2,8 @@
 
 import React, { useEffect } from "react";
 import AuthProvider from "./authProvider";
-import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import StoreProvider, { useAppSelector } from "./redux";
+import ReduxProvider, { useAppSelector } from "./redux";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector((state) => state.global?.isSidebarCollapsed ?? false);
@@ -23,10 +22,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <Sidebar />
       <main
         className={`flex w-full flex-col bg-background transition-all duration-300 ${
-          isSidebarCollapsed ? "ml-0" : "ml-64"
+          isSidebarCollapsed ? "ml-14" : "ml-64"
         }`}
       >
-        <Navbar />
         <div className="flex-1 p-6">{children}</div>
       </main>
     </div>
@@ -35,11 +33,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <StoreProvider>
+    <ReduxProvider>
       <AuthProvider>
         <DashboardLayout>{children}</DashboardLayout>
       </AuthProvider>
-    </StoreProvider>
+    </ReduxProvider>
   );
 };
 
