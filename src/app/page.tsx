@@ -295,9 +295,7 @@ export default function TeamPage() {
         {/* Title */}
         <h1 className={`${oxanium.className} text-5xl sm:text-6xl font-extrabold uppercase leading-none tracking-tight`}>
           <span className="text-foreground">Team </span>
-          <span className="bg-linear-to-r from-primary via-violet-400 to-primary bg-clip-text text-transparent">
-            Generator
-          </span>
+          <span className="text-gradient-primary">Generator</span>
         </h1>
 
         {/* Gradient separator */}
@@ -370,12 +368,12 @@ export default function TeamPage() {
         <button
           onClick={handleRun}
           disabled={running || validSlots === 0}
-          className={`${oxanium.className} group relative flex items-center gap-3 rounded-full bg-primary
-            px-14 py-4 text-base font-bold uppercase tracking-[0.15em] text-primary-foreground
+          className={`${oxanium.className} group relative flex items-center gap-3 rounded-full bg-gradient-primary
+            px-14 py-4 text-base font-bold uppercase tracking-[0.15em] text-white
             transition-all duration-300
             hover:scale-105 hover:shadow-[0_0_50px_rgba(139,92,246,0.55)]
             active:scale-100
-            disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none`}
+            disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none`}
         >
           {running ? (
             <><Loader2 className="h-5 w-5 animate-spin" />Generating…</>

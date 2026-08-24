@@ -54,6 +54,7 @@
 
 /* Light theme */
 :root {
+  --gradient-primary: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
   --background: #F9F9FB;
   --surface: #F2F1F6;
   --foreground: #111118;
@@ -94,6 +95,7 @@
 
 /* Dark theme (default) */
 .dark {
+  --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
   --background: #0B0A10;
   --surface: #13121A;
   --foreground: #E8E7F0;
@@ -129,6 +131,18 @@
   --sidebar-accent-foreground: #9896A8;
   --sidebar-border: #22212C;
   --sidebar-ring: #8B5CF6;
+}
+
+@layer utilities {
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 @layer base {
