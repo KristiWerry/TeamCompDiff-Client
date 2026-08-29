@@ -79,6 +79,7 @@ export interface GeneratedComp {
   picks: CompPick[];
   analysis: CompAnalysis;
   cacheAgesAt: Record<string, string>;
+  overallScore: number;
 }
 
 export interface TeamCompResponse {
@@ -177,6 +178,10 @@ export const api = createApi({
       query: (body) => ({ url: "/comps", method: "POST", body }),
       invalidatesTags: ["Comps"],
     }),
+    updateComp: build.mutation<SavedComp, { compId: string; compName: string }>({
+      query: ({ compId, ...body }) => ({ url: `/comps/${compId}`, method: "PUT", body }),
+      invalidatesTags: ["Comps"],
+    }),
     deleteComp: build.mutation<{ deleted: boolean; compId: string }, string>({
       query: (compId) => ({ url: `/comps/${compId}`, method: "DELETE" }),
       invalidatesTags: ["Comps"],
@@ -216,6 +221,7 @@ export const {
   useRunTeamCompMutation,
   useGetCompsQuery,
   useSaveCompMutation,
+  useUpdateCompMutation,
   useDeleteCompMutation,
   useGetQueriesQuery,
   useCreateQueryMutation,

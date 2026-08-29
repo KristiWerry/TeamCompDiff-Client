@@ -2,11 +2,12 @@
 
 import { useAppDispatch, useAppSelector } from "../../app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "../../state";
-import { useGetAuthUserQuery, useGetCompsQuery, useGetProfileQuery } from "../../state/api";
+import { useGetAuthUserQuery, useGetCompsQuery, useGetProfileQuery, useGetQueriesQuery } from "../../state/api";
 import { signOut } from "aws-amplify/auth";
 import { Oxanium } from "next/font/google";
 import {
   BarChart3,
+  Bookmark,
   ChevronDown,
   ChevronLeft,
   ChevronUp,
@@ -25,6 +26,157 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const oxanium = Oxanium({ subsets: ["latin"], weight: ["700", "800"] });
+
+// ── Queries nav item (expandable in full mode, icon+tooltip in mini) ─────────
+
+const QueriesNavItem = ({ dm, mini }: { dm: boolean; mini: boolean }) => {
+  const pathname = usePathname();
+  const isActive = pathname === "/queries" || pathname.startsWith("/queries/");
+  const [isExpanded, setIsExpanded] = useState(isActive);
+
+  const { data: queriesData } = useGetQueriesQuery();
+  const queries = queriesData?.queries ?? [];
+
+  useEffect(() => {
+    if (isActive) setIsExpanded(true);
+  }, [isActive]);
+
+  if (mini) {
+    return (
+      <Link href="/queries" className="group w-full">
+        <div
+          className={`relative flex cursor-pointer items-center justify-center py-3 text-sm font-medium transition-all duration-150
+            ${dm ? "" : (isActive
+              ? "bg-accent text-accent-foreground"
+              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground")}`}
+          style={dm ? {
+            background: isActive ? "rgba(139,92,246,0.1)" : "transparent",
+            color: isActive ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)",
+          } : undefined}
+          onMouseEnter={dm ? (e) => {
+            if (!isActive) {
+              e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.75)";
+            }
+          } : undefined}
+          onMouseLeave={dm ? (e) => {
+            if (!isActive) {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "rgba(255,255,255,0.4)";
+            }
+          } : undefined}
+        >
+          <Bookmark className="h-4 w-4 shrink-0" />
+          <span
+            className={`pointer-events-none absolute left-full ml-3 whitespace-nowrap rounded-md px-2.5 py-1.5
+              text-xs font-medium opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity duration-150 z-50
+              ${dm ? "" : "bg-popover text-popover-foreground border border-border shadow-md"}`}
+            style={dm ? {
+              background: "#17161E",
+              color: "rgba(255,255,255,0.85)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
+            } : undefined}
+          >
+            Queries
+          </span>
+        </div>
+      </Link>
+    );
+  }
+
+  return (
+    <div>
+      <div
+        className={`relative flex items-center text-sm font-medium transition-all duration-150
+          ${dm ? "" : (isActive
+            ? "bg-accent text-accent-foreground"
+            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground")}`}
+        style={dm ? {
+          background: isActive ? "rgba(139,92,246,0.1)" : "transparent",
+          color: isActive ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)",
+        } : undefined}
+        onMouseEnter={dm ? (e) => {
+          if (!isActive) {
+            e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+            e.currentTarget.style.color = "rgba(255,255,255,0.75)";
+          }
+        } : undefined}
+        onMouseLeave={dm ? (e) => {
+          if (!isActive) {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "rgba(255,255,255,0.4)";
+          }
+        } : undefined}
+      >
+        {isActive && (
+          <div className="absolute left-0 top-0 h-full w-0.5 rounded-r bg-primary" />
+        )}
+        <Link href="/queries" className="flex flex-1 items-center gap-3 px-6 py-2.5 min-w-0">
+          <Bookmark className="h-4 w-4 shrink-0" />
+          <span>Queries</span>
+          {queries.length > 0 && (
+            <span
+              className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${dm ? "" : "bg-primary/10 text-primary"}`}
+              style={dm ? {
+                background: "rgba(139,92,246,0.2)",
+                color: "rgba(167,139,250,0.9)",
+                border: "1px solid rgba(139,92,246,0.3)",
+              } : undefined}
+            >
+              {queries.length}
+            </span>
+          )}
+        </Link>
+        <button
+          onClick={() => setIsExpanded((prev) => !prev)}
+          className={`pr-5 py-2.5 pl-1 shrink-0 transition-colors ${dm ? "" : "text-muted-foreground"}`}
+          style={dm ? { color: "rgba(255,255,255,0.3)" } : undefined}
+          aria-label="Toggle saved queries"
+        >
+          {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        </button>
+      </div>
+
+      {isExpanded && (
+        <div
+          className={`flex flex-col pb-1 ${dm ? "" : "bg-muted/30"}`}
+          style={dm ? { background: "rgba(0,0,0,0.2)" } : undefined}
+        >
+          {queries.length === 0 ? (
+            <p
+              className={`py-1.5 pl-14 pr-6 text-xs ${dm ? "" : "text-muted-foreground/60"}`}
+              style={dm ? { color: "rgba(255,255,255,0.2)" } : undefined}
+            >
+              No saved queries yet.
+            </p>
+          ) : (
+            queries.map((query) => {
+              const queryActive = pathname === `/queries/${query.queryId}`;
+              return (
+                <Link
+                  key={query.queryId}
+                  href={`/queries/${query.queryId}`}
+                  className={`flex w-full items-center py-1.5 pl-14 pr-6 text-xs font-medium truncate transition-colors
+                    ${dm ? "" : (queryActive
+                      ? "text-foreground bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent")}`}
+                  style={dm ? { color: queryActive ? "rgba(167,139,250,1)" : "rgba(139,92,246,0.6)" } : undefined}
+                  onMouseEnter={dm ? (e) => { e.currentTarget.style.color = "rgba(167,139,250,1)"; } : undefined}
+                  onMouseLeave={dm ? (e) => { e.currentTarget.style.color = queryActive ? "rgba(167,139,250,1)" : "rgba(139,92,246,0.6)"; } : undefined}
+                >
+                  {query.queryName}
+                </Link>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 
 const Sidebar = () => {
   const dispatch = useAppDispatch();
@@ -146,6 +298,7 @@ const Sidebar = () => {
         <nav className="z-10 w-full mt-2">
           <SidebarLink icon={Home}   label="Team Generator"    href="/"         dm={dm} mini={mini} />
           <TeamCompsNavItem dm={dm} mini={mini} />
+          <QueriesNavItem dm={dm} mini={mini} />
           <SidebarLink icon={Users}  label="Draft"             href="/draft"    dm={dm} mini={mini} />
           <SidebarLink icon={Search} label="Opponent Scouting" href="/scouting" dm={dm} mini={mini} />
           <SidebarLink icon={User}   label="Profile"           href="/profile"  dm={dm} mini={mini} />
@@ -314,7 +467,7 @@ const SidebarLink = ({ href, icon: Icon, label, dm, mini }: SidebarLinkProps) =>
 
 const TeamCompsNavItem = ({ dm, mini }: { dm: boolean; mini: boolean }) => {
   const pathname = usePathname();
-  const isActive = pathname === "/comps";
+  const isActive = pathname === "/comps" || pathname.startsWith("/comps/");
   const [isExpanded, setIsExpanded] = useState(isActive);
 
   const { data: compsData } = useGetCompsQuery();
@@ -434,19 +587,24 @@ const TeamCompsNavItem = ({ dm, mini }: { dm: boolean; mini: boolean }) => {
               No saved comps yet.
             </p>
           ) : (
-            comps.map((comp) => (
-              <Link
-                key={comp.compId}
-                href="/comps"
-                className={`flex w-full items-center py-1.5 pl-14 pr-6 text-xs font-medium truncate transition-colors
-                  ${dm ? "" : "text-muted-foreground hover:text-foreground hover:bg-accent"}`}
-                style={dm ? { color: "rgba(139,92,246,0.6)" } : undefined}
-                onMouseEnter={dm ? (e) => { e.currentTarget.style.color = "rgba(167,139,250,1)"; } : undefined}
-                onMouseLeave={dm ? (e) => { e.currentTarget.style.color = "rgba(139,92,246,0.6)"; } : undefined}
-              >
-                {comp.compName}
-              </Link>
-            ))
+            comps.map((comp) => {
+              const compActive = pathname === `/comps/${comp.compId}`;
+              return (
+                <Link
+                  key={comp.compId}
+                  href={`/comps/${comp.compId}`}
+                  className={`flex w-full items-center py-1.5 pl-14 pr-6 text-xs font-medium truncate transition-colors
+                    ${dm ? "" : (compActive
+                      ? "text-foreground bg-accent"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent")}`}
+                  style={dm ? { color: compActive ? "rgba(167,139,250,1)" : "rgba(139,92,246,0.6)" } : undefined}
+                  onMouseEnter={dm ? (e) => { e.currentTarget.style.color = "rgba(167,139,250,1)"; } : undefined}
+                  onMouseLeave={dm ? (e) => { e.currentTarget.style.color = compActive ? "rgba(167,139,250,1)" : "rgba(139,92,246,0.6)"; } : undefined}
+                >
+                  {comp.compName}
+                </Link>
+              );
+            })
           )}
         </div>
       )}

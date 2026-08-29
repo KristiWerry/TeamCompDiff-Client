@@ -3,17 +3,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Oxanium } from "next/font/google";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setChampions, initMatchesFromCache } from "@/state/teamSlice";
+import { setChampions, initMatchesFromCache, loadQueryPlayers } from "@/state/teamSlice";
 import { getCachedMatches } from "@/lib/matchCache";
 import SummonerCard from "@/components/Team/SummonerCard";
+import PowerSpikeSegment from "@/components/PowerSpikeSegment";
+import EngageMeter from "@/components/EngageMeter";
 import {
   useGetChampionsQuery,
+  useGetQueriesQuery,
   useRunTeamCompMutation,
   useSaveCompMutation,
   useCreateQueryMutation,
   type PlayerInput,
   type GeneratedComp,
   type TeamCompResponse,
+  type SavedQuery,
 } from "@/state/api";
 import type { Role } from "@/lib/riot/types";
 import {
@@ -21,6 +25,7 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
+  FolderOpen,
   Loader2,
   Play,
   RefreshCw,
@@ -28,6 +33,7 @@ import {
   Swords,
   Target,
   BarChart3,
+  X,
 } from "lucide-react";
 
 const oxanium = Oxanium({ subsets: ["latin"], weight: ["600", "700", "800"] });
@@ -66,7 +72,7 @@ const FEATURES = [
 
 // ── Comp card helpers ─────────────────────────────────────────────────────
 
-const DDRAG_ICON    = (id: string) =>
+const DDRAG_ICON = (id: string) =>
   `https://ddragon.leagueoflegends.com/cdn/16.16.1/img/champion/${id}.png`;
 const DDRAG_LOADING = (id: string) =>
   `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${id}_0.jpg`;
@@ -81,56 +87,38 @@ const roleIconUrl = (role: string) =>
   `${CDRAG_POS}/icon-position-${ROLE_POS[role] ?? role}.png`;
 
 const ROLE_COLORS: Record<string, string> = {
-  top:     "239,68,68",
-  jungle:  "34,197,94",
-  mid:     "139,92,246",
-  adc:     "245,158,11",
+  top: "239,68,68",
+  jungle: "34,197,94",
+  mid: "139,92,246",
+  adc: "245,158,11",
   support: "59,130,246",
 };
 
 const ARCHETYPE_CFG: Record<string, { color: string; bg: string; border: string; bar: string }> = {
-  "Teamfight":    { color: "#60A5FA", bg: "rgba(59,130,246,0.12)",  border: "rgba(59,130,246,0.3)",  bar: "linear-gradient(90deg,#3B82F6,#60A5FA)" },
-  "Poke / Siege": { color: "#FBBF24", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  bar: "linear-gradient(90deg,#F59E0B,#FBBF24)" },
-  "Pick Comp":    { color: "#F87171", bg: "rgba(239,68,68,0.12)",   border: "rgba(239,68,68,0.3)",   bar: "linear-gradient(90deg,#EF4444,#F87171)" },
-  "Split Push":   { color: "#34D399", bg: "rgba(16,185,129,0.12)",  border: "rgba(16,185,129,0.3)",  bar: "linear-gradient(90deg,#10B981,#34D399)" },
-  "Early Game":   { color: "#FB923C", bg: "rgba(249,115,22,0.12)",  border: "rgba(249,115,22,0.3)",  bar: "linear-gradient(90deg,#F97316,#FB923C)" },
+  "Teamfight": { color: "#60A5FA", bg: "rgba(59,130,246,0.12)", border: "rgba(59,130,246,0.3)", bar: "linear-gradient(90deg,#3B82F6,#60A5FA)" },
+  "Poke / Siege": { color: "#FBBF24", bg: "rgba(245,158,11,0.12)", border: "rgba(245,158,11,0.3)", bar: "linear-gradient(90deg,#F59E0B,#FBBF24)" },
+  "Pick Comp": { color: "#F87171", bg: "rgba(239,68,68,0.12)", border: "rgba(239,68,68,0.3)", bar: "linear-gradient(90deg,#EF4444,#F87171)" },
+  "Split Push": { color: "#34D399", bg: "rgba(16,185,129,0.12)", border: "rgba(16,185,129,0.3)", bar: "linear-gradient(90deg,#10B981,#34D399)" },
+  "Early Game": { color: "#FB923C", bg: "rgba(249,115,22,0.12)", border: "rgba(249,115,22,0.3)", bar: "linear-gradient(90deg,#F97316,#FB923C)" },
 };
 const DEFAULT_CFG = {
   color: "#A78BFA", bg: "rgba(139,92,246,0.12)", border: "rgba(139,92,246,0.3)", bar: "linear-gradient(90deg,#8B5CF6,#A78BFA)",
 };
 const archetypeCfg = (a: string) => ARCHETYPE_CFG[a] ?? DEFAULT_CFG;
 
-const POWER_SPIKE_CFG: Record<string, { bg: string; color: string; label: string }> = {
-  early: { bg: "rgba(249,115,22,0.15)", color: "#FB923C", label: "Early game" },
-  mid:   { bg: "rgba(234,179,8,0.15)",  color: "#FACC15", label: "Mid game"   },
-  late:  { bg: "rgba(59,130,246,0.15)", color: "#60A5FA", label: "Late game"  },
-  mixed: { bg: "rgba(139,92,246,0.15)", color: "#A78BFA", label: "Mixed"      },
-};
 
-const ENGAGE_CFG: Record<string, { bg: string; color: string }> = {
-  "Low":       { bg: "rgba(100,116,139,0.15)", color: "#94A3B8" },
-  "Medium":    { bg: "rgba(234,179,8,0.15)",   color: "#FACC15" },
-  "High":      { bg: "rgba(249,115,22,0.15)",  color: "#FB923C" },
-  "Very High": { bg: "rgba(239,68,68,0.15)",   color: "#F87171" },
-};
-
-const computeOverallScore = (comp: GeneratedComp) =>
-  Math.round(
-    (comp.picks.reduce((sum, p) => sum + (p.suggestions[0]?.score ?? 0), 0) / 5 / 10 * 50) +
-    (comp.analysis.synergies.overall / 10 * 50)
-  );
 
 // Synergy: higher = better. Matches bar gradient: light blue → indigo → violet.
 const synergyPill = (s: number) =>
-  s >= 7.5 ? { bg: "rgba(124,58,237,0.15)",  color: "#A78BFA" }  // violet  — excellent
-  : s >= 5  ? { bg: "rgba(129,140,248,0.15)", color: "#818CF8" }  // indigo  — decent
-  :           { bg: "rgba(125,211,252,0.15)", color: "#7DD3FC" };  // sky     — weak
+  s >= 7.5 ? { bg: "rgba(124,58,237,0.15)", color: "#A78BFA" }  // violet  — excellent
+    : s >= 5 ? { bg: "rgba(129,140,248,0.15)", color: "#818CF8" }  // indigo  — decent
+      : { bg: "rgba(125,211,252,0.15)", color: "#7DD3FC" };  // sky     — weak
 
 // Difficulty: lower = easier = better. Green → yellow → red palette.
 const difficultyPill = (d: number) =>
-  d <= 3 ? { bg: "rgba(52,211,153,0.15)",  color: "#34D399" }  // green  — easy
-  : d <= 6 ? { bg: "rgba(250,204,21,0.15)", color: "#FACC15" }  // yellow — moderate
-  :          { bg: "rgba(248,113,113,0.15)", color: "#F87171" }; // red    — hard
+  d <= 3 ? { bg: "rgba(52,211,153,0.15)", color: "#34D399" }  // green  — easy
+    : d <= 6 ? { bg: "rgba(250,204,21,0.15)", color: "#FACC15" }  // yellow — moderate
+      : { bg: "rgba(248,113,113,0.15)", color: "#F87171" }; // red    — hard
 
 // ── NameModal ─────────────────────────────────────────────────────────────
 
@@ -291,7 +279,7 @@ function SynergyPairs({
             </div>
 
             <span className="text-xs font-bold tabular-nums shrink-0" style={{ color }}>
-              {pair.score.toFixed(1)}
+              {pct}%
             </span>
           </div>
         );
@@ -313,6 +301,129 @@ function StatPill({ bg, color, children }: { bg: string; color: string; children
   );
 }
 
+// ── LoadQueryModal ────────────────────────────────────────────────────────
+
+function LoadQueryModal({
+  dm,
+  onLoad,
+  onClose,
+}: {
+  dm: boolean;
+  onLoad: (players: PlayerInput[]) => void;
+  onClose: () => void;
+}) {
+  const { data, isLoading } = useGetQueriesQuery();
+  const queries: SavedQuery[] = data?.queries ?? [];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        className={`w-full max-w-md mx-4 rounded-2xl shadow-2xl overflow-hidden ${dm ? "" : "bg-card border border-border"}`}
+        style={dm ? { background: "#0d0d14", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 24px 60px rgba(0,0,0,0.7)" } : undefined}
+      >
+        {/* Header */}
+        <div
+          className={`flex items-center justify-between px-6 py-4 ${dm ? "" : "border-b border-border"}`}
+          style={dm ? { borderBottom: "1px solid rgba(255,255,255,0.07)" } : undefined}
+        >
+          <div>
+            <h3
+              className={`text-base font-bold ${dm ? "" : "text-foreground"}`}
+              style={dm ? { color: "rgba(255,255,255,0.92)" } : undefined}
+            >
+              Load Query
+            </h3>
+            <p
+              className={`text-xs mt-0.5 ${dm ? "" : "text-muted-foreground"}`}
+              style={dm ? { color: "rgba(255,255,255,0.38)" } : undefined}
+            >
+              Select a query to populate the slots
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full transition-colors dark:hover:bg-white/10 hover:bg-accent"
+            style={dm ? { color: "rgba(255,255,255,0.4)" } : undefined}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-4 max-h-112 overflow-y-auto space-y-2">
+          {isLoading ? (
+            <div
+              className={`flex items-center justify-center gap-2 py-10 text-sm ${dm ? "" : "text-muted-foreground"}`}
+              style={dm ? { color: "rgba(255,255,255,0.4)" } : undefined}
+            >
+              <Loader2 className="h-4 w-4 animate-spin" /> Loading…
+            </div>
+          ) : queries.length === 0 ? (
+            <p
+              className={`text-center text-sm py-10 italic ${dm ? "" : "text-muted-foreground"}`}
+              style={dm ? { color: "rgba(255,255,255,0.35)" } : undefined}
+            >
+              No saved queries yet. Save one from the main page first.
+            </p>
+          ) : (
+            queries.map((q) => (
+              <button
+                key={q.queryId}
+                onClick={() => { onLoad(q.players); onClose(); }}
+                className={`w-full text-left rounded-xl p-4 transition-all ${dm ? "" : "bg-muted hover:bg-accent"}`}
+                style={dm ? { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" } : undefined}
+                onMouseEnter={dm ? (e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; } : undefined}
+                onMouseLeave={dm ? (e) => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"; } : undefined}
+              >
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <span
+                    className={`font-semibold text-sm leading-tight ${dm ? "" : "text-foreground"}`}
+                    style={dm ? { color: "rgba(255,255,255,0.9)" } : undefined}
+                  >
+                    {q.queryName}
+                  </span>
+                  <span
+                    className={`text-[10px] shrink-0 ${dm ? "" : "text-muted-foreground"}`}
+                    style={dm ? { color: "rgba(255,255,255,0.32)" } : undefined}
+                  >
+                    {q.lastRunAt ? `Run ${new Date(q.lastRunAt).toLocaleDateString()}` : "Never run"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {q.players.map((p, i) => {
+                    const color = ROLE_COLORS[p.primaryRole] ?? "255,255,255";
+                    return (
+                      <div
+                        key={i}
+                        className="flex items-center justify-center rounded-full h-7 w-7"
+                        style={{
+                          background: `rgba(${color}, 0.15)`,
+                          border: `1px solid rgba(${color}, 0.35)`,
+                        }}
+                      >
+                        <img
+                          src={roleIconUrl(p.primaryRole)}
+                          alt={p.primaryRole}
+                          className="h-4 w-4"
+                          style={{ filter: "grayscale(1) brightness(4)", opacity: 0.85 }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── CompCard ──────────────────────────────────────────────────────────────
 
 const ROLES = ["top", "jungle", "mid", "adc", "support"] as const;
@@ -328,16 +439,14 @@ function CompCard({
   nameToId: Record<string, string>;
   dm: boolean;
 }) {
-  const [expanded, setExpanded]       = useState(false);
-  const [saving, setSaving]           = useState(false);
-  const [isSaving, setIsSaving]       = useState(false);
-  const [rerollIdx, setRerollIdx]     = useState([0, 0, 0, 0, 0]);
+  const [expanded, setExpanded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [rerollIdx, setRerollIdx] = useState([0, 0, 0, 0, 0]);
   const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
 
-  const cfg          = archetypeCfg(comp.archetype);
-  const psConfig     = POWER_SPIKE_CFG[comp.analysis.powerSpike] ?? POWER_SPIKE_CFG.mixed;
-  const engConfig    = ENGAGE_CFG[comp.analysis.engage]          ?? ENGAGE_CFG["Low"];
-  const overallScore = computeOverallScore(comp);
+  const cfg = archetypeCfg(comp.archetype);
+  const overallScore = comp.overallScore;
 
   const handleSave = async (name: string) => {
     setIsSaving(true);
@@ -365,8 +474,6 @@ function CompCard({
           >
             {comp.archetype}
           </span>
-          <StatPill bg={psConfig.bg} color={psConfig.color}>{psConfig.label}</StatPill>
-          <StatPill bg={engConfig.bg} color={engConfig.color}>{comp.analysis.engage} engage</StatPill>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
@@ -428,6 +535,16 @@ function CompCard({
         </div>
       </div>
 
+      {/* Power spike + Engage row */}
+      <div
+        className={`mx-5 mb-4 flex items-start gap-8 rounded-lg px-4 py-3 ${dm ? "" : "bg-muted/40"}`}
+        style={dm ? { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" } : undefined}
+      >
+        <PowerSpikeSegment spike={comp.analysis.powerSpike} size="lg" />
+        <div className="w-px self-stretch bg-black/8 dark:bg-white/7" />
+        <EngageMeter engage={comp.analysis.engage} size="lg" />
+      </div>
+
       {/* Description */}
       <p
         className={`px-5 pb-4 text-sm leading-relaxed ${dm ? "" : "text-muted-foreground"}`}
@@ -442,15 +559,12 @@ function CompCard({
       {/* Champion banner row */}
       <div className="grid grid-cols-5 gap-2 px-4 pt-3 pb-4">
         {ROLES.map((role, rIdx) => {
-          const pick      = comp.picks.find((p) => p.role === role);
-          const suggIdx   = rerollIdx[rIdx];
-          const sugg      = pick?.suggestions?.[suggIdx];
-          const champId   = sugg?.champion ? nameToId[sugg.champion] : undefined;
+          const pick = comp.picks.find((p) => p.role === role);
+          const suggIdx = rerollIdx[rIdx];
+          const sugg = pick?.suggestions?.[suggIdx];
+          const champId = sugg?.champion ? nameToId[sugg.champion] : undefined;
           const canReroll = (pick?.suggestions?.length ?? 0) > 1;
           const isHovered = hoveredSlot === rIdx;
-
-          // Solid bg color used for the fade-in/out gradients so they blend seamlessly
-          const bannerBg = dm ? "#0c0c1a" : "#e8eaf0";
 
           return (
             <div key={role} className="flex flex-col items-center gap-2">
@@ -474,7 +588,7 @@ function CompCard({
                   className="absolute inset-0"
                   style={{
                     clipPath: "polygon(0 0, 100% 0, 100% 86%, 50% 100%, 0 86%)",
-                    background: bannerBg,
+                    background: "var(--banner-bg)",
                   }}
                 >
                   {/* Champion loading screen art */}
@@ -495,7 +609,7 @@ function CompCard({
                     className="absolute inset-x-0 top-0"
                     style={{
                       height: "32%",
-                      background: `linear-gradient(to bottom, ${bannerBg} 0%, transparent 100%)`,
+                      background: "linear-gradient(to bottom, var(--banner-bg) 0%, transparent 100%)",
                     }}
                   />
 
@@ -504,7 +618,7 @@ function CompCard({
                     className="absolute inset-x-0 bottom-0"
                     style={{
                       height: "52%",
-                      background: `linear-gradient(to top, ${bannerBg} 0%, ${bannerBg} 18%, transparent 100%)`,
+                      background: "linear-gradient(to top, var(--banner-bg) 0%, var(--banner-bg) 18%, transparent 100%)",
                     }}
                   />
 
@@ -546,18 +660,12 @@ function CompCard({
                     className="absolute inset-x-0 text-center"
                     style={{ bottom: "17%", padding: "0 6px" }}
                   >
-                    <div
-                      className="text-[9px] font-semibold uppercase tracking-widest truncate mb-0.5"
-                      style={{ color: dm ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)" }}
-                    >
+                    <div className="text-[9px] font-semibold uppercase tracking-widest truncate mb-0.5 text-white/45">
                       {sugg?.champion ?? "—"}
                     </div>
                     <div
-                      className="text-[11px] font-bold uppercase tracking-wide truncate"
-                      style={{
-                        color: dm ? "rgba(255,255,255,0.92)" : "rgba(0,0,0,0.85)",
-                        textShadow: dm ? "0 1px 6px rgba(0,0,0,0.9)" : "none",
-                      }}
+                      className="text-[11px] font-bold uppercase tracking-wide truncate text-white/90"
+                      style={{ textShadow: "var(--banner-text-shadow)" }}
                     >
                       {pick?.player ?? "Fill"}
                     </div>
@@ -725,8 +833,8 @@ function CompCard({
 // ── Main page ─────────────────────────────────────────────────────────────
 
 export default function TeamPage() {
-  const dispatch   = useAppDispatch();
-  const slots      = useAppSelector((s: any) => s.team?.slots ?? []) as any[];
+  const dispatch = useAppDispatch();
+  const slots = useAppSelector((s: any) => s.team?.slots ?? []) as any[];
   const isDarkMode = useAppSelector((s: any) => s.global?.isDarkMode ?? false);
 
   const validSlots = slots.filter((s: any) => s.primaryRole && s.slotChampPool?.length > 0).length;
@@ -743,12 +851,13 @@ export default function TeamPage() {
   );
 
   const [runTeamComp, { isLoading: running }] = useRunTeamCompMutation();
-  const [saveComp]                            = useSaveCompMutation();
+  const [saveComp] = useSaveCompMutation();
   const [createQuery, { isLoading: savingQueryRequest }] = useCreateQueryMutation();
-  const [results, setResults]                 = useState<TeamCompResponse | null>(null);
-  const [runError, setRunError]               = useState("");
-  const [savingQuery, setSavingQuery]         = useState(false);
-  const [toast, setToast]                     = useState("");
+  const [results, setResults]           = useState<TeamCompResponse | null>(null);
+  const [runError, setRunError]         = useState("");
+  const [savingQuery, setSavingQuery]   = useState(false);
+  const [showLoadQuery, setShowLoadQuery] = useState(false);
+  const [toast, setToast]               = useState("");
   const [lastSavedSlotsJson, setLastSavedSlotsJson] = useState("");
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -779,10 +888,10 @@ export default function TeamPage() {
     slots
       .filter((s: any) => s.primaryRole && s.slotChampPool?.length > 0)
       .map((s: any) => ({
-        primaryRole:   s.primaryRole as Role,
+        primaryRole: s.primaryRole as Role,
         secondaryRole: s.secondaryRole as Role | undefined,
-        champPool:     s.slotChampPool,
-        riotId:        s.gameName && s.tagLine ? `${s.gameName}#${s.tagLine}` : undefined,
+        champPool: s.slotChampPool,
+        riotId: s.gameName && s.tagLine ? `${s.gameName}#${s.tagLine}` : undefined,
       }));
 
   const handleRun = async () => {
@@ -818,7 +927,7 @@ export default function TeamPage() {
 
   // Sort comps by overall score descending
   const sortedComps = useMemo(
-    () => [...(results?.comps ?? [])].sort((a, b) => computeOverallScore(b) - computeOverallScore(a)),
+    () => [...(results?.comps ?? [])].sort((a, b) => b.overallScore - a.overallScore),
     [results]
   );
 
@@ -849,14 +958,14 @@ export default function TeamPage() {
             onMouseEnter={(e) => {
               const el = e.currentTarget as HTMLDivElement;
               el.style.borderColor = f.borderColor;
-              el.style.boxShadow   = f.shadow;
-              el.style.transform   = "translateY(-3px)";
+              el.style.boxShadow = f.shadow;
+              el.style.transform = "translateY(-3px)";
             }}
             onMouseLeave={(e) => {
               const el = e.currentTarget as HTMLDivElement;
               el.style.borderColor = "";
-              el.style.boxShadow   = "";
-              el.style.transform   = "";
+              el.style.boxShadow = "";
+              el.style.transform = "";
             }}
           >
             <div
@@ -881,6 +990,7 @@ export default function TeamPage() {
         ))}
       </div>
 
+      {/* ── Slot cards ── */}
       {/* ── Slot cards ── */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {slots.map((slot: any) => (
@@ -907,14 +1017,36 @@ export default function TeamPage() {
           )}
         </button>
 
-        {validSlots > 0 && !savingQuery && JSON.stringify(slots) !== lastSavedSlotsJson && (
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => setSavingQuery(true)}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setShowLoadQuery(true)}
+            className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all hover:scale-105 ${isDarkMode ? "" : "border border-border text-muted-foreground hover:text-foreground hover:border-border/60"}`}
+            style={isDarkMode ? {
+              border: "1px solid rgba(255,255,255,0.12)",
+              color: "rgba(255,255,255,0.55)",
+            } : undefined}
+            onMouseEnter={isDarkMode ? (e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.28)"; e.currentTarget.style.color = "rgba(255,255,255,0.9)"; } : undefined}
+            onMouseLeave={isDarkMode ? (e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.55)"; } : undefined}
           >
-            <Save className="h-3.5 w-3.5" />Save as query
+            <FolderOpen className="h-3.5 w-3.5" />
+            Load query
           </button>
-        )}
+
+          {validSlots > 0 && !savingQuery && JSON.stringify(slots) !== lastSavedSlotsJson && (
+            <button
+              onClick={() => setSavingQuery(true)}
+              className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium transition-all hover:scale-105 ${isDarkMode ? "" : "border border-border text-muted-foreground hover:text-foreground hover:border-border/60"}`}
+              style={isDarkMode ? {
+                border: "1px solid rgba(255,255,255,0.12)",
+                color: "rgba(255,255,255,0.55)",
+              } : undefined}
+              onMouseEnter={isDarkMode ? (e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.28)"; e.currentTarget.style.color = "rgba(255,255,255,0.9)"; } : undefined}
+              onMouseLeave={isDarkMode ? (e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; e.currentTarget.style.color = "rgba(255,255,255,0.55)"; } : undefined}
+            >
+              <Save className="h-3.5 w-3.5" />Save as query
+            </button>
+          )}
+        </div>
 
         {savingQuery && (
           <NameModal
@@ -931,6 +1063,18 @@ export default function TeamPage() {
         {runError && <p className="text-xs text-destructive">{runError}</p>}
       </div>
 
+      {/* ── Load Query modal ── */}
+      {showLoadQuery && (
+        <LoadQueryModal
+          dm={isDarkMode}
+          onLoad={(players) => {
+            dispatch(loadQueryPlayers(players));
+            showToast("Query loaded!");
+          }}
+          onClose={() => setShowLoadQuery(false)}
+        />
+      )}
+
       {/* ── Toast ── */}
       {toast && (
         <div
@@ -944,7 +1088,7 @@ export default function TeamPage() {
 
       {/* ── Results ── */}
       {sortedComps.length > 0 && (
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-6xl mx-auto w-full">
           <div className="flex items-end gap-3">
             <h2 className={`${oxanium.className} text-2xl font-bold uppercase tracking-wide text-foreground`}>
               {sortedComps.length} Comp{sortedComps.length !== 1 ? "s" : ""} Generated

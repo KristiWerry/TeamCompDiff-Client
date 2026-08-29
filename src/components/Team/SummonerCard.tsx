@@ -77,7 +77,7 @@ function RoleIconRow({
           onClick={() => onChange(undefined)}
           title="None"
           className={`flex h-9 w-9 items-center justify-center rounded transition-all duration-150
-            ${!dm ? (!value ? "bg-muted border-2 border-border" : "bg-muted/50 border border-border hover:bg-muted") : ""}`}
+            ${!dm ? (!value ? "bg-muted border-2 border-border" : "bg-muted border border-border hover:bg-accent") : ""}`}
           style={dm ? {
             background: !value ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.03)",
             border: !value ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.07)",
@@ -98,7 +98,7 @@ function RoleIconRow({
               onClick={() => onChange(role)}
               title={ROLE_LABELS[role]}
               className={`flex h-9 w-9 items-center justify-center rounded transition-all duration-150
-                ${!dm && !isActive ? "bg-muted/50 border border-border hover:bg-muted" : ""}
+                ${!dm && !isActive ? "bg-muted border border-border hover:bg-accent" : ""}
                 ${!dm && isActive ? "border-2" : ""}`}
               style={dm ? {
                 background: isActive ? ROLE_BG[role] : "rgba(255,255,255,0.03)",
@@ -114,7 +114,7 @@ function RoleIconRow({
                   src={ROLE_ICONS[role]}
                   alt={role}
                   className="h-5 w-5 object-contain transition-opacity duration-150"
-                  style={{ opacity: isActive ? 1 : (dm ? 0.35 : 0.45) }}
+                  style={{ opacity: isActive ? 1 : (dm ? 0.35 : 0.65) }}
                 />
               )}
             </button>
